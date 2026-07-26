@@ -14,10 +14,11 @@
 - Plan: 2026-07-25 — After the actual, modified, stale, selected, and collision states exist, strengthen their hierarchy with a brighter glossy 90s palette while preserving the existing collision color meanings.
 - Notes: 2026-07-25 — Published and live-verified through Calendar PR #21. Published, selected-collision, personal-modification, stale-review, and collision states now have distinct glossy colors and a visible state key; phone, tablet, and desktop checks passed without page errors or document overflow.
 
-### BL-0006 — PLAN READY
+### BL-0006 — DONE
 - Captured: 2026-07-22 15:09 America/Los_Angeles
 - Request: for the schedule repo as well as the lesson p-lanner repo i want an option to like create an alternate schedule. for example maybe if ts is open even if there is no collision i want to save it for that day/week number that that station is open if that makes sense
 - Plan: 2026-07-25 — Add one browser-local versioned alternate-schedule overlay shared by Calendar and Lesson Planner, with exact-date default scope, optional recurring weekday/parity scope, source fingerprints, and an immutable authoritative base schedule.
+- Notes: 2026-07-26 — Shipped across gymnastics-vault-calendar PR #21 and lesson-planner-program PR #14. Calendar saves browser-local exact-date or weekday/parity personal opening cards without changing the published schedule; Lesson Planner reads the shared contract as a read-only overlay, requires exact class/date/week scope, and marks mismatched, occupied, or Calendar-stale entries for review. Pages and live phone, iPad, and desktop validation passed.
 
 ### BL-0020 — PLAN READY
 - Captured: 2026-07-25 15:08 America/Los_Angeles
