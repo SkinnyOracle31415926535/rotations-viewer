@@ -385,6 +385,164 @@
   .open-block.cat-tramp { background-color: #fff33f; border-left-color: #d88b00; }
   .open-block.cat-ts { background-color: #3e6bff; border-left-color: #00fff0; color: #f8fbff; }
   .open-block.cat-other { background-color: #b5c4ff; border-left-color: #657383; }
+  .open-block[data-opening-block] { cursor: pointer; touch-action: manipulation; }
+  .open-block.is-opening-selected {
+    z-index: 5;
+    outline: 4px solid #ff4fd8;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 6px #36e9ff, 0 8px 18px rgba(44, 25, 104, 0.48);
+  }
+  .open-block.is-opening-match {
+    z-index: 4;
+    outline: 4px solid #35f2a0;
+    outline-offset: 2px;
+    filter: saturate(1.32) brightness(1.08);
+  }
+  .open-block.is-opening-nearby { outline: 3px dashed #ff4fd8; outline-offset: 2px; }
+  .open-block.is-opening-saved::after {
+    content: "✓";
+    left: auto;
+    right: 2px;
+    bottom: 2px;
+    z-index: 4;
+    width: 14px;
+    height: 14px;
+    border: 1px solid #075f35;
+    border-radius: 0;
+    color: #063c25;
+    background: #8bffc3;
+    font: 900 10px/12px Arial, sans-serif;
+    text-align: center;
+  }
+  .equip-track.is-opening-equipment-focus {
+    outline: 3px solid rgba(255, 79, 216, 0.88);
+    outline-offset: -3px;
+    background-color: rgba(107, 255, 211, 0.28);
+  }
+  .opening-search-notice {
+    margin: 0;
+    border-bottom: 2px solid #118451;
+    padding: 10px 14px;
+    color: #103d2c;
+    background: linear-gradient(90deg, #b9ffdc, #dffcff 58%, #ffd6f5);
+    font-size: 12px;
+    font-weight: 850;
+  }
+  .opening-modification-dialog {
+    width: min(610px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+    overflow: auto;
+    border: 4px ridge #dcfff2;
+    border-radius: 0;
+    padding: 0;
+    color: #102c21;
+    background: #d7f5e5;
+    box-shadow: 8px 8px 0 rgba(12, 67, 42, 0.56), 0 24px 70px rgba(9, 49, 31, 0.42);
+  }
+  .opening-modification-dialog::backdrop { background: rgba(8, 43, 29, 0.56); backdrop-filter: blur(2px); }
+  .opening-modification-form { margin: 0; padding: 18px; }
+  .opening-modification-titlebar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin: -18px -18px 16px;
+    border-bottom: 2px solid #06492d;
+    padding: 10px 12px;
+    color: #f3fff8;
+    background: linear-gradient(90deg, #06492d, #0c8150 62%, #25b879);
+  }
+  .opening-modification-titlebar h2 { margin: 0; font-size: 21px; }
+  .opening-modification-titlebar p { margin: 3px 0 0; color: #c7f8dd; font-size: 10px; font-weight: 850; letter-spacing: 0.08em; }
+  .opening-modification-close {
+    width: 28px;
+    height: 26px;
+    border: 2px outset #f2f2f2;
+    border-radius: 0;
+    padding: 0;
+    color: #111;
+    background: #c0c0c0;
+    font: 900 18px/18px Arial, sans-serif;
+    cursor: pointer;
+  }
+  .opening-modification-selection {
+    margin: 0 0 13px;
+    border: 2px inset #f2f2f2;
+    padding: 9px;
+    color: #243a30;
+    background: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .opening-modification-warning {
+    margin: 0 0 14px;
+    border-left: 5px solid #ff4fd8;
+    padding: 8px 10px;
+    color: #3c1640;
+    background: #ffe4f7;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.4;
+  }
+  .opening-modification-field {
+    display: grid;
+    gap: 5px;
+    margin: 12px 0;
+    font-size: 12px;
+    font-weight: 850;
+  }
+  .opening-modification-field input {
+    min-height: 36px;
+    box-sizing: border-box;
+    border: 2px inset #eeeeee;
+    border-radius: 0;
+    padding: 6px 8px;
+    color: #13291f;
+    background: #ffffff;
+    font: 700 14px/1.2 Verdana, sans-serif;
+  }
+  .opening-modification-scope {
+    display: grid;
+    gap: 7px;
+    margin: 14px 0;
+    border: 2px groove #eefdf5;
+    padding: 10px;
+  }
+  .opening-modification-scope legend { padding: 0 5px; font-size: 12px; font-weight: 900; }
+  .opening-modification-scope label { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; }
+  .opening-recurring-label { margin: 8px 0 0; color: #1d583d; font-size: 12px; font-weight: 800; }
+  .opening-modification-error { margin: 10px 0 0; color: #8d1234; font-size: 12px; font-weight: 900; }
+  .opening-modification-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .opening-modification-actions button {
+    border: 2px outset #eeeeee;
+    border-radius: 0;
+    padding: 8px 11px;
+    color: #111;
+    background: #c0c0c0;
+    font: 800 12px/1 Verdana, sans-serif;
+    cursor: pointer;
+  }
+  .opening-modification-actions .is-save { color: #062d1c; background: #74f0ad; }
+  .opening-modification-dialog [hidden] { display: none !important; }
+  .opening-modification-toast {
+    position: fixed;
+    right: 14px;
+    bottom: 14px;
+    z-index: 100;
+    display: grid;
+    gap: 6px;
+    max-width: min(410px, calc(100vw - 28px));
+    border: 3px ridge #d8fff0;
+    border-radius: 0;
+    padding: 10px 12px;
+    color: #f5fff9;
+    background: #075b37;
+    box-shadow: 6px 6px 0 rgba(6, 48, 30, 0.58);
+    font-size: 12px;
+    font-weight: 850;
+  }
+  .opening-modification-toast a { color: #93ffd0; }
+  .opening-modification-toast[hidden] { display: none; }
   .schedule-meta { margin: 2px 0 0; color: #dce9dd; font-size: 13px; }
   h3 {
     margin: 18px 0 8px;
@@ -4962,6 +5120,49 @@
 </div>
 </section>
 </main>
+<dialog class="opening-modification-dialog" data-opening-modification-dialog aria-labelledby="opening-modification-title">
+  <form class="opening-modification-form" data-opening-modification-form method="dialog">
+    <div class="opening-modification-titlebar">
+      <div>
+        <p>PERSONAL ALTERNATE SCHEDULE</p>
+        <h2 id="opening-modification-title">Save this opening</h2>
+      </div>
+      <button type="button" class="opening-modification-close" data-opening-modification-close aria-label="Close">×</button>
+    </div>
+    <p class="opening-modification-selection" data-opening-modification-selection></p>
+    <p class="opening-modification-warning">
+      This creates a browser-local modified card. It does not edit the published schedule or claim the station is officially assigned.
+    </p>
+    <label class="opening-modification-field">
+      <span>Class using this opening</span>
+      <input type="text" maxlength="100" autocomplete="off" data-opening-modification-class required>
+    </label>
+    <fieldset class="opening-modification-scope">
+      <legend>When should this personal card appear?</legend>
+      <label>
+        <input type="radio" name="opening-modification-scope" value="date" checked>
+        One exact date
+      </label>
+      <label>
+        <input type="radio" name="opening-modification-scope" value="recurring">
+        Repeat for this weekday and Odd/Even rotation
+      </label>
+      <label class="opening-modification-field" data-opening-date-fields>
+        <span>Exact date</span>
+        <input type="date" data-opening-modification-date>
+      </label>
+      <p class="opening-recurring-label" data-opening-recurring-fields hidden>
+        <span data-opening-recurring-label></span>
+      </p>
+    </fieldset>
+    <p class="opening-modification-error" data-opening-modification-error role="alert" hidden></p>
+    <div class="opening-modification-actions">
+      <button type="button" data-opening-modification-close>Cancel</button>
+      <button type="button" class="is-save" data-opening-modification-save>Save personal card</button>
+    </div>
+  </form>
+</dialog>
+<p class="opening-modification-toast" data-opening-modification-toast role="status" hidden></p>
 <script>
 (() => {
   const rule = {"timezone":"America/Los_Angeles","week_start":"monday","odd_week_numbers":[1,3],"even_week_numbers":[2,4],"manual_confirmation_from_week":5,"rule_id":"vault_default","schedule_id":null,"week_end":"sunday","month_week_anchor":"first_monday_of_month","overflow_week_behavior":"manual_confirmation_required","notes":"Vault default: weeks 1 and 3 select Odd; weeks 2 and 4 select Even. Week 5 or later requires manual confirmation; ordinal parity is only a suggestion."};
@@ -5072,5 +5273,8 @@
 })();
 </script>
 <script src="timeline-zoom.js"></script>
+<script src="schedule-version.js"></script>
+<script src="alternate-schedule.js"></script>
+<script src="opening-modifications.js"></script>
 </body>
 </html>
