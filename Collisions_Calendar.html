@@ -116,20 +116,30 @@
     font-weight: 900;
     text-shadow: 0 1px 0 rgba(255, 255, 225, 0.78), 0 3px 8px rgba(12, 109, 50, 0.26);
   }
-  .section-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-left: auto; }
-  .day-collapse-toggle {
-    border: 1px solid #f6ffd1;
-    border-radius: 7px;
-    padding: 7px 10px;
-    color: #0b4028;
-    background: linear-gradient(180deg, #f6ffd1 0%, #a9d84a 42%, #55ac3a 100%);
-    box-shadow: 0 4px 0 #237c3a, 0 1px 0 rgba(255,255,255,0.8) inset;
-    font: 700 16px/1 var(--display-font);
+  .day-collapse-title {
+    appearance: none;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    color: inherit;
+    background: transparent;
     cursor: pointer;
-    text-shadow: 0 1px 0 #ffffe5, 0 2px 0 rgba(8, 83, 39, 0.28);
+    font: inherit;
+    line-height: inherit;
+    text-align: left;
+    text-shadow: inherit;
   }
-  .day-collapse-toggle:hover { filter: saturate(1.16) brightness(1.08); transform: translateY(-1px); }
-  .day-collapse-toggle:focus-visible { outline: 3px solid #f5ffd5; outline-offset: 2px; }
+  .day-collapse-title::after {
+    content: "▾";
+    display: inline-block;
+    margin-left: 0.2em;
+    font-family: system-ui, sans-serif;
+    font-size: 0.55em;
+    vertical-align: 0.12em;
+  }
+  .day-section.is-collapsed-day .day-collapse-title::after { content: "▸"; }
+  .day-collapse-title:hover { filter: saturate(1.16) brightness(1.08); }
+  .day-collapse-title:focus-visible { outline: 3px solid #f5ffd5; outline-offset: 3px; border-radius: 4px; }
   .day-section.is-collapsed-day .collision-scroll { display: none; }
   .day-section.is-collapsed-day { padding-bottom: 14px; }
   .collision-scroll {
@@ -304,8 +314,6 @@
     h1 { font-size: 34px; }
     .section-head h2 { font-size: 24px; }
     .section-head span { font-size: 12px; }
-    .section-actions { gap: 7px; }
-    .day-collapse-toggle { font-size: 14px; padding: 6px 8px; }
     .collision-grid { grid-template-rows: 32px var(--timeline-height); }
     .corner, .equip-head { font-size: 7px; }
   }
@@ -319,7 +327,6 @@
     .day-section:first-child { break-before: auto; }
     .collision-scroll { box-shadow: none; }
     .day-section.is-collapsed-day .collision-scroll { display: block !important; }
-    .day-collapse-toggle { display: none !important; }
   }
 </style>
 </head>
@@ -1612,29 +1619,25 @@
     section.classList.toggle('is-collapsed-day', collapsed);
     if (!toggle) return;
     toggle.setAttribute('aria-expanded', String(!collapsed));
-    toggle.textContent = collapsed ? 'Expand' : 'Collapse';
     toggle.setAttribute('aria-label', `${collapsed ? 'Expand' : 'Collapse'} ${section.dataset.sheet} day`);
   };
 
   daySections.forEach((section) => {
     const scroll = section.querySelector('.collision-scroll');
     const head = section.querySelector('.section-head');
-    if (!scroll || !head) return;
+    const title = head && head.querySelector('h2');
+    if (!scroll || !head || !title) return;
     scroll.id = `${section.id}-content`;
-    const actions = document.createElement('div');
-    actions.className = 'section-actions';
-    const count = head.querySelector('span');
-    if (count) actions.append(count);
     const toggle = document.createElement('button');
     toggle.type = 'button';
-    toggle.className = 'day-collapse-toggle';
+    toggle.className = 'day-collapse-title';
     toggle.dataset.collisionDayCollapse = '';
     toggle.setAttribute('aria-controls', scroll.id);
+    toggle.textContent = title.textContent.trim();
     toggle.addEventListener('click', () => {
       setCollapseState(section, !section.classList.contains('is-collapsed-day'));
     });
-    actions.append(toggle);
-    head.append(actions);
+    title.replaceChildren(toggle);
     setCollapseState(section, false);
   });
 
