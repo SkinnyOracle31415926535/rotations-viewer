@@ -88,9 +88,25 @@
     text-shadow: 0 1px 0 #fff2a8;
   }
   .day-picker-menu { position: relative; }
-  .day-picker-menu > summary { display: inline-flex; align-items: center; gap: 7px; list-style: none; }
+  .day-picker-menu > summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    gap: 7px;
+    border: 1px solid #237c3a;
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: #f8ffe9;
+    background: linear-gradient(180deg, #a9d84a 0%, #55ac3a 48%, #237c3a 100%);
+    box-shadow: 0 4px 0 #0f6130, 0 9px 14px rgba(24, 102, 52, 0.22), 0 1px 0 rgba(255,255,255,0.76) inset;
+    font: 700 18px/1 var(--display-font);
+    list-style: none;
+    cursor: pointer;
+    text-shadow: 0 1px 0 #0b4028, 0 2px 0 rgba(7, 69, 31, 0.38);
+  }
+  .day-picker-menu > summary:hover { filter: saturate(1.18) brightness(1.1); transform: translateY(-1px); }
   .day-picker-menu > summary::-webkit-details-marker { display: none; }
-  .day-picker-menu > summary::after { content: "▾"; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; transition: transform 150ms ease; }
+  .day-picker-menu > summary::after { content: "▾"; color: #f8ffe9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; transition: transform 150ms ease; }
   .day-picker-menu[open] > summary::after { transform: rotate(180deg); }
   .day-picker-options { position: absolute; top: calc(100% + 10px); right: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; width: min(600px, calc(100vw - 28px)); padding: 12px; border: 3px ridge #d7fff4; border-radius: 10px; background: rgba(251, 252, 247, 0.98); box-shadow: var(--shadow); }
   .day-picker-options button { min-width: 0; white-space: nowrap; }
@@ -100,7 +116,6 @@
     height: 0;
   }
   .controls a.is-current, .controls [data-calendar-day-button].is-current { outline: 3px solid #ffdf48; outline-offset: 2px; filter: saturate(1.22) brightness(1.08); }
-  .auto-nav-status { margin: 9px 0 0; color: #25433c; font-size: 13px; font-weight: 800; }
   main {
     max-width: 1480px;
     margin: 0 auto;
@@ -127,9 +142,6 @@
     color: #b015a6;
     text-shadow: var(--text-raise);
   }
-  .day-collapse-toggle { border: 1px solid #0c6a54; border-radius: 7px; color: #f8fff9; background: linear-gradient(180deg, #35ffe4 0%, #0f9c8d 42%, #086155 100%); padding: 7px 10px; box-shadow: 0 4px 0 #045045, 0 1px 0 rgba(255,255,255,0.75) inset; font: 700 16px/1 var(--display-font); cursor: pointer; text-shadow: 0 1px 0 #fff89e, 0 2px 0 rgba(74,33,124,0.55); }
-  .day-collapse-toggle:hover { filter: saturate(1.18) brightness(1.1); transform: translateY(-1px); }
-  .day-section.is-collapsed-day .timeline-scroll, .day-section.is-collapsed-day .opening-search-notice { display: none; }
   .timeline-scroll {
     overflow-x: hidden;
     width: 100%;
@@ -555,7 +567,6 @@
   }
   .opening-modification-toast a { color: #93ffd0; }
   .opening-modification-toast[hidden] { display: none; }
-  .schedule-meta { margin: 2px 0 0; color: #dce9dd; font-size: 13px; }
   h3 {
     margin: 18px 0 8px;
     font-size: 18px;
@@ -593,8 +604,7 @@
     .day-section { break-before: page; border-bottom: 0; }
     .day-section:first-child { break-before: auto; }
     .timeline-scroll { overflow: visible; box-shadow: none; }
-    html.day-picker-ready .day-section[data-sheet]:not(.is-active-day), .day-section.is-collapsed-day .timeline-scroll, .day-section.is-collapsed-day .opening-search-notice { display: block !important; }
-    .day-collapse-toggle { display: none; }
+    html.day-picker-ready .day-section[data-sheet]:not(.is-active-day) { display: block !important; }
   }
 </style>
 </head>
@@ -603,7 +613,6 @@
   <div class="top-inner">
     <div>
       <h1>Openings</h1>
-      <p class="schedule-meta">Schedule ID: spring_2026 · status: active</p>
     </div>
     <nav class="controls">
 <a class="view-link" href="index.html" data-calendar-view="schedule">Rotations</a>
@@ -612,7 +621,6 @@
 <details class="day-picker-menu" data-day-picker-menu><summary><span data-day-picker-summary>Choose day</span></summary><div class="day-picker-options"><button type="button" data-calendar-day-button data-sheet="Mon-Odd" aria-controls="mon-odd" aria-pressed="false">Mon-Odd</button><button type="button" data-calendar-day-button data-sheet="Tues-Odd" aria-controls="tues-odd" aria-pressed="false">Tues-Odd</button><button type="button" data-calendar-day-button data-sheet="Wed-Odd" aria-controls="wed-odd" aria-pressed="false">Wed-Odd</button><button type="button" data-calendar-day-button data-sheet="Thurs-Odd" aria-controls="thurs-odd" aria-pressed="false">Thurs-Odd</button><button type="button" data-calendar-day-button data-sheet="Fri-Odd" aria-controls="fri-odd" aria-pressed="false">Fri-Odd</button><button type="button" data-calendar-day-button data-sheet="Sat-Odd" aria-controls="sat-odd" aria-pressed="false">Sat-Odd</button><span class="day-picker-break" aria-hidden="true"></span><button type="button" data-calendar-day-button data-sheet="Mon-Even" aria-controls="mon-even" aria-pressed="false">Mon-Even</button><button type="button" data-calendar-day-button data-sheet="Tues-Even" aria-controls="tues-even" aria-pressed="false">Tues-Even</button><button type="button" data-calendar-day-button data-sheet="Wed-Even" aria-controls="wed-even" aria-pressed="false">Wed-Even</button><button type="button" data-calendar-day-button data-sheet="Thurs-Even" aria-controls="thurs-even" aria-pressed="false">Thurs-Even</button><button type="button" data-calendar-day-button data-sheet="Fri-Even" aria-controls="fri-even" aria-pressed="false">Fri-Even</button><button type="button" data-calendar-day-button data-sheet="Sat-Even" aria-controls="sat-even" aria-pressed="false">Sat-Even</button></div></details>
       <button type="button" onclick="window.print()">Print</button>
     </nav>
-    <p class="auto-nav-status" data-auto-nav-status hidden></p>
   </div>
 </header>
 <main>
@@ -5198,31 +5206,6 @@
   const daySections = Array.from(document.querySelectorAll('.day-section[data-sheet]'));
   const dayButtons = Array.from(document.querySelectorAll('[data-calendar-day-button]'));
 
-  const setCollapseState = (section, collapsed) => {
-    const toggle = section.querySelector('[data-opening-day-collapse]');
-    section.classList.toggle('is-collapsed-day', collapsed);
-    if (!toggle) return;
-    toggle.setAttribute('aria-expanded', String(!collapsed));
-    toggle.textContent = collapsed ? 'Expand calendar' : 'Collapse calendar';
-  };
-
-  daySections.forEach((section) => {
-    const timeline = section.querySelector('.timeline-scroll');
-    const head = section.querySelector('.section-head');
-    if (!timeline || !head) return;
-    timeline.id = `${section.id}-content`;
-    const toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'day-collapse-toggle';
-    toggle.dataset.openingDayCollapse = '';
-    toggle.setAttribute('aria-controls', timeline.id);
-    toggle.addEventListener('click', () => {
-      setCollapseState(section, !section.classList.contains('is-collapsed-day'));
-    });
-    head.append(toggle);
-    setCollapseState(section, false);
-  });
-
   const setDayButtonState = (sheet) => {
     dayButtons.forEach((button) => {
       const current = button.dataset.sheet === sheet;
@@ -5237,7 +5220,6 @@
     const target = daySections.find((section) => section.dataset.sheet === sheet);
     if (!target) return false;
     daySections.forEach((section) => section.classList.toggle('is-active-day', section === target));
-    setCollapseState(target, false);
     page.classList.add('day-picker-ready');
     setDayButtonState(sheet);
     if (dayPickerSummary) dayPickerSummary.textContent = `Day: ${sheet}`;
