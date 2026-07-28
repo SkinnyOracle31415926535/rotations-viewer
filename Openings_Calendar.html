@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
-<title>Spring 2026 Openings Calendar</title>
+<title>Openings</title>
 <style>
   :root {
     --paper: #fbfcf7;
@@ -87,11 +87,19 @@
     box-shadow: 0 5px 0 #9c4f00, 0 10px 16px rgba(20, 32, 24, 0.18), 0 1px 0 rgba(255, 255, 255, 0.82) inset;
     text-shadow: 0 1px 0 #fff2a8;
   }
+  .day-picker-menu { position: relative; }
+  .day-picker-menu > summary { display: inline-flex; align-items: center; gap: 7px; list-style: none; }
+  .day-picker-menu > summary::-webkit-details-marker { display: none; }
+  .day-picker-menu > summary::after { content: "▾"; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; transition: transform 150ms ease; }
+  .day-picker-menu[open] > summary::after { transform: rotate(180deg); }
+  .day-picker-options { position: absolute; top: calc(100% + 10px); right: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; width: min(600px, calc(100vw - 28px)); padding: 12px; border: 3px ridge #d7fff4; border-radius: 10px; background: rgba(251, 252, 247, 0.98); box-shadow: var(--shadow); }
+  .day-picker-options button { min-width: 0; white-space: nowrap; }
+  .day-picker-break { grid-column: 1 / -1; height: 1px; margin: 1px 0; background: var(--line-strong); }
   .nav-break {
     flex-basis: 100%;
     height: 0;
   }
-  .controls a.is-current { outline: 3px solid #ffdf48; outline-offset: 2px; filter: saturate(1.22) brightness(1.08); }
+  .controls a.is-current, .controls [data-calendar-day-button].is-current { outline: 3px solid #ffdf48; outline-offset: 2px; filter: saturate(1.22) brightness(1.08); }
   .auto-nav-status { margin: 9px 0 0; color: #25433c; font-size: 13px; font-weight: 800; }
   main {
     max-width: 1480px;
@@ -103,6 +111,7 @@
     padding: 20px 0 30px;
     border-bottom: 2px solid var(--line);
   }
+  html.day-picker-ready .day-section[data-sheet]:not(.is-active-day) { display: none !important; }
   .section-head {
     display: flex;
     justify-content: space-between;
@@ -118,6 +127,9 @@
     color: #b015a6;
     text-shadow: var(--text-raise);
   }
+  .day-collapse-toggle { border: 1px solid #0c6a54; border-radius: 7px; color: #f8fff9; background: linear-gradient(180deg, #35ffe4 0%, #0f9c8d 42%, #086155 100%); padding: 7px 10px; box-shadow: 0 4px 0 #045045, 0 1px 0 rgba(255,255,255,0.75) inset; font: 700 16px/1 var(--display-font); cursor: pointer; text-shadow: 0 1px 0 #fff89e, 0 2px 0 rgba(74,33,124,0.55); }
+  .day-collapse-toggle:hover { filter: saturate(1.18) brightness(1.1); transform: translateY(-1px); }
+  .day-section.is-collapsed-day .timeline-scroll, .day-section.is-collapsed-day .opening-search-notice { display: none; }
   .timeline-scroll {
     overflow-x: hidden;
     width: 100%;
@@ -581,34 +593,23 @@
     .day-section { break-before: page; border-bottom: 0; }
     .day-section:first-child { break-before: auto; }
     .timeline-scroll { overflow: visible; box-shadow: none; }
+    html.day-picker-ready .day-section[data-sheet]:not(.is-active-day), .day-section.is-collapsed-day .timeline-scroll, .day-section.is-collapsed-day .opening-search-notice { display: block !important; }
+    .day-collapse-toggle { display: none; }
   }
 </style>
 </head>
-<body id="top">
+<body id="top" data-schedule-id="spring_2026">
 <header class="topbar">
   <div class="top-inner">
     <div>
-      <h1>Spring 2026 Openings Calendar</h1>
+      <h1>Openings</h1>
       <p class="schedule-meta">Schedule ID: spring_2026 · status: active</p>
     </div>
     <nav class="controls">
-      <a class="view-link" href="index.html" data-calendar-view="schedule">Schedule</a>
+<a class="view-link" href="index.html" data-calendar-view="schedule">Rotations</a>
 <a class="view-link is-current" href="Openings_Calendar.html" data-calendar-view="openings" aria-current="page">Openings</a>
 <a class="view-link" href="Collisions_Calendar.html" data-calendar-view="collisions">Collisions</a>
-<span class="nav-break" aria-hidden="true"></span>
-<a href="#mon-odd" data-sheet="Mon-Odd">Mon-Odd</a>
-<a href="#tues-odd" data-sheet="Tues-Odd">Tues-Odd</a>
-<a href="#wed-odd" data-sheet="Wed-Odd">Wed-Odd</a>
-<a href="#thurs-odd" data-sheet="Thurs-Odd">Thurs-Odd</a>
-<a href="#fri-odd" data-sheet="Fri-Odd">Fri-Odd</a>
-<a href="#sat-odd" data-sheet="Sat-Odd">Sat-Odd</a>
-<span class="nav-break" aria-hidden="true"></span>
-<a href="#mon-even" data-sheet="Mon-Even">Mon-Even</a>
-<a href="#tues-even" data-sheet="Tues-Even">Tues-Even</a>
-<a href="#wed-even" data-sheet="Wed-Even">Wed-Even</a>
-<a href="#thurs-even" data-sheet="Thurs-Even">Thurs-Even</a>
-<a href="#fri-even" data-sheet="Fri-Even">Fri-Even</a>
-<a href="#sat-even" data-sheet="Sat-Even">Sat-Even</a>
+<details class="day-picker-menu" data-day-picker-menu><summary><span data-day-picker-summary>Choose day</span></summary><div class="day-picker-options"><button type="button" data-calendar-day-button data-sheet="Mon-Odd" aria-controls="mon-odd" aria-pressed="false">Mon-Odd</button><button type="button" data-calendar-day-button data-sheet="Tues-Odd" aria-controls="tues-odd" aria-pressed="false">Tues-Odd</button><button type="button" data-calendar-day-button data-sheet="Wed-Odd" aria-controls="wed-odd" aria-pressed="false">Wed-Odd</button><button type="button" data-calendar-day-button data-sheet="Thurs-Odd" aria-controls="thurs-odd" aria-pressed="false">Thurs-Odd</button><button type="button" data-calendar-day-button data-sheet="Fri-Odd" aria-controls="fri-odd" aria-pressed="false">Fri-Odd</button><button type="button" data-calendar-day-button data-sheet="Sat-Odd" aria-controls="sat-odd" aria-pressed="false">Sat-Odd</button><span class="day-picker-break" aria-hidden="true"></span><button type="button" data-calendar-day-button data-sheet="Mon-Even" aria-controls="mon-even" aria-pressed="false">Mon-Even</button><button type="button" data-calendar-day-button data-sheet="Tues-Even" aria-controls="tues-even" aria-pressed="false">Tues-Even</button><button type="button" data-calendar-day-button data-sheet="Wed-Even" aria-controls="wed-even" aria-pressed="false">Wed-Even</button><button type="button" data-calendar-day-button data-sheet="Thurs-Even" aria-controls="thurs-even" aria-pressed="false">Thurs-Even</button><button type="button" data-calendar-day-button data-sheet="Fri-Even" aria-controls="fri-even" aria-pressed="false">Fri-Even</button><button type="button" data-calendar-day-button data-sheet="Sat-Even" aria-controls="sat-even" aria-pressed="false">Sat-Even</button></div></details>
       <button type="button" onclick="window.print()">Print</button>
     </nav>
     <p class="auto-nav-status" data-auto-nav-status hidden></p>
@@ -5163,6 +5164,7 @@
   </form>
 </dialog>
 <p class="opening-modification-toast" data-opening-modification-toast role="status" hidden></p>
+<script src="week-anchor.js"></script>
 <script>
 (() => {
   const rule = {"timezone":"America/Los_Angeles","week_start":"monday","odd_week_numbers":[1,3],"even_week_numbers":[2,4],"manual_confirmation_from_week":5,"rule_id":"vault_default","schedule_id":null,"week_end":"sunday","month_week_anchor":"first_monday_of_month","overflow_week_behavior":"manual_confirmation_required","notes":"Vault default: weeks 1 and 3 select Odd; weeks 2 and 4 select Even. Week 5 or later requires manual confirmation; ordinal parity is only a suggestion."};
@@ -5190,7 +5192,102 @@
     status.hidden = false;
     status.textContent = message;
   };
-  // A day button (or other direct link) is an explicit user choice.
+  const dayPicker = document.querySelector('[data-day-picker-menu]');
+  const dayPickerSummary = document.querySelector('[data-day-picker-summary]');
+  const page = document.documentElement;
+  const daySections = Array.from(document.querySelectorAll('.day-section[data-sheet]'));
+  const dayButtons = Array.from(document.querySelectorAll('[data-calendar-day-button]'));
+
+  const setCollapseState = (section, collapsed) => {
+    const toggle = section.querySelector('[data-opening-day-collapse]');
+    section.classList.toggle('is-collapsed-day', collapsed);
+    if (!toggle) return;
+    toggle.setAttribute('aria-expanded', String(!collapsed));
+    toggle.textContent = collapsed ? 'Expand calendar' : 'Collapse calendar';
+  };
+
+  daySections.forEach((section) => {
+    const timeline = section.querySelector('.timeline-scroll');
+    const head = section.querySelector('.section-head');
+    if (!timeline || !head) return;
+    timeline.id = `${section.id}-content`;
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'day-collapse-toggle';
+    toggle.dataset.openingDayCollapse = '';
+    toggle.setAttribute('aria-controls', timeline.id);
+    toggle.addEventListener('click', () => {
+      setCollapseState(section, !section.classList.contains('is-collapsed-day'));
+    });
+    head.append(toggle);
+    setCollapseState(section, false);
+  });
+
+  const setDayButtonState = (sheet) => {
+    dayButtons.forEach((button) => {
+      const current = button.dataset.sheet === sheet;
+      button.classList.toggle('is-current', current);
+      button.setAttribute('aria-pressed', String(current));
+      if (current) button.setAttribute('aria-current', 'location');
+      else button.removeAttribute('aria-current');
+    });
+  };
+
+  const showSheet = (sheet, message) => {
+    const target = daySections.find((section) => section.dataset.sheet === sheet);
+    if (!target) return false;
+    daySections.forEach((section) => section.classList.toggle('is-active-day', section === target));
+    setCollapseState(target, false);
+    page.classList.add('day-picker-ready');
+    setDayButtonState(sheet);
+    if (dayPickerSummary) dayPickerSummary.textContent = `Day: ${sheet}`;
+    if (dayPicker) dayPicker.open = false;
+    if (message) say(message);
+    window.dispatchEvent(new Event('calendar-day-change'));
+    return true;
+  };
+
+  const waitForManualChoice = (message) => {
+    daySections.forEach((section) => section.classList.remove('is-active-day'));
+    page.classList.add('day-picker-ready');
+    setDayButtonState(null);
+    say(message);
+  };
+
+  dayButtons.forEach((button) => {
+    button.addEventListener('click', () => showSheet(button.dataset.sheet, `Showing ${button.dataset.sheet}.`));
+  });
+
+  const hashText = () => {
+    if (!window.location.hash || window.location.hash === '#top') return '';
+    try {
+      return decodeURIComponent(window.location.hash.slice(1));
+    } catch (_error) {
+      return '';
+    }
+  };
+
+  const sheetFromHash = () => {
+    const id = hashText().toLowerCase();
+    const target = daySections.find((section) => section.id.toLowerCase() === id);
+    return target ? target.dataset.sheet : null;
+  };
+
+  const openingSearchSheetFromHash = () => {
+    const hash = hashText();
+    if (!hash.startsWith('openings?')) return null;
+    const sheet = new URLSearchParams(hash.slice('openings?'.length)).get('sheet');
+    return daySections.some((section) => section.dataset.sheet === sheet) ? sheet : null;
+  };
+
+  const showHashTarget = () => {
+    const sheet = openingSearchSheetFromHash() || sheetFromHash();
+    return Boolean(sheet && showSheet(sheet, `Showing ${sheet}.`));
+  };
+
+  window.addEventListener('hashchange', showHashTarget);
+  if (showHashTarget()) return;
+  // An unrecognized hash remains an explicit user choice.
   if (window.location.hash && window.location.hash !== '#top') return;
   const partsForGymDate = () => {
     try {
@@ -5226,7 +5323,17 @@
   const targetMonth = targetDate.getUTCMonth() + 1;
   const targetYear = targetDate.getUTCFullYear();
   if (!scheduleDay[targetWeekday]) {
-    say('Choose a schedule day above.');
+    waitForManualChoice('Choose a schedule day above.');
+    return;
+  }
+
+  const anchoredRotation = window.GymWeekAnchor && window.GymWeekAnchor.rotationForDate(targetDate);
+  if (anchoredRotation) {
+    const sheet = `${scheduleDay[targetWeekday]}-${anchoredRotation.rotation}`;
+    const statusPrefix = isSunday ? 'Sunday — showing upcoming ' : 'Showing ';
+    if (!showSheet(sheet, `${statusPrefix}${sheet} · saved week anchor`)) {
+      waitForManualChoice(`${sheet} is not included in this calendar.`);
+    }
     return;
   }
 
@@ -5236,40 +5343,26 @@
   const firstMondayOffset = (8 - monthStart.getUTCDay()) % 7;
   const firstMonday = new Date(Date.UTC(targetYear, targetMonth - 1, 1 + firstMondayOffset));
   if (targetDate < firstMonday) {
-    say(`Before this month's first Monday — choose Odd or Even above.`);
+    waitForManualChoice(`Before this month's first Monday — choose Odd or Even above.`);
     return;
   }
   const monthWeek = Math.floor((targetDate - firstMonday) / 86400000 / 7) + 1;
   const manualFrom = Number(rule.manual_confirmation_from_week || 5);
   if (monthWeek >= manualFrom) {
-    say(`Month week ${monthWeek} is not assigned a rotation yet — choose Odd or Even above.`);
+    waitForManualChoice(`Month week ${monthWeek} is not assigned a rotation yet — choose Odd or Even above.`);
     return;
   }
   const oddWeeks = new Set((rule.odd_week_numbers || [1, 3]).map(Number));
   const evenWeeks = new Set((rule.even_week_numbers || [2, 4]).map(Number));
   const rotation = oddWeeks.has(monthWeek) ? 'Odd' : evenWeeks.has(monthWeek) ? 'Even' : null;
   if (!rotation) {
-    say(`Month week ${monthWeek} has no saved rotation — choose a schedule day above.`);
+    waitForManualChoice(`Month week ${monthWeek} has no saved rotation — choose a schedule day above.`);
     return;
   }
   const sheet = `${scheduleDay[targetWeekday]}-${rotation}`;
-  const target = document.getElementById(sheet.toLowerCase());
-  if (!target) {
-    say(`${sheet} is not included in this calendar.`);
-    return;
+  if (!showSheet(sheet, `${isSunday ? 'Sunday — showing upcoming ' : 'Showing '}${sheet} · month week ${monthWeek}`)) {
+    waitForManualChoice(`${sheet} is not included in this calendar.`);
   }
-  const currentButton = document.querySelector(`.controls a[data-sheet="${sheet}"]`);
-  if (currentButton) {
-    currentButton.classList.add('is-current');
-    currentButton.setAttribute('aria-current', 'location');
-  }
-  say(`${isSunday ? 'Sunday — showing upcoming ' : 'Showing '}${sheet} · month week ${monthWeek}`);
-  window.addEventListener('load', () => {
-    const header = document.querySelector('.topbar');
-    const offset = (header ? header.getBoundingClientRect().height : 0) + 12;
-    const destination = window.scrollY + target.getBoundingClientRect().top - offset;
-    window.scrollTo({ top: Math.max(0, destination), behavior: 'auto' });
-  }, { once: true });
 })();
 </script>
 <script src="timeline-zoom.js"></script>

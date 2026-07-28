@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Spring 2026 schedule</title>
+<title>Rotations</title>
 <style>
   :root {
     --ink: #2b195a;
@@ -223,6 +223,25 @@
   .collision-audit-actions button.is-save:hover { filter: saturate(1.28) brightness(1.12); }
   .collision-audit-toast { position: fixed; right: 18px; bottom: 18px; z-index: 100; max-width: min(410px, calc(100vw - 36px)); margin: 0; border: 2px ridge #fff4a0; border-radius: 9px; padding: 11px 13px; color: #fff7bd; background: rgba(21,95,23,0.97); box-shadow: 0 6px 0 rgba(13,69,16,0.7), 0 12px 30px rgba(19,69,25,0.4); font-family: var(--computer-font, Verdana, sans-serif); font-size: 12px; font-weight: 800; }
   .collision-audit-toast[data-kind="error"] { border-color: #fff274; color: #fff8b6; }
+  .week-anchor-dialog { width: min(510px, calc(100vw - 28px)); border: 3px ridge #d7fff4; border-radius: 14px; padding: 0; color: #183528; background: linear-gradient(135deg, #fffdf0, #d9fff5 62%, #fff8c9); box-shadow: 0 8px 0 rgba(31,111,25,0.48), 0 24px 70px rgba(19,69,25,0.35); }
+  .week-anchor-dialog::backdrop { background: rgba(12, 72, 20, 0.52); backdrop-filter: blur(3px); }
+  .week-anchor-form { padding: 20px; }
+  .week-anchor-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .week-anchor-kicker { margin: 0 0 4px; color: #318d2d; font-family: var(--computer-font, Verdana, sans-serif); font-size: 10px; font-weight: 900; letter-spacing: 0.12em; }
+  .week-anchor-heading h2 { margin: 0; color: #4d1ba8; font-family: var(--retro-font, "Brush Script MT", cursive); font-size: 31px; line-height: 1; text-shadow: 0 1px 0 #fff7a8, 0 2px 0 #ff9de7, 0 3px 0 #6ee7ff; }
+  .week-anchor-close { display: grid; place-items: center; width: 33px; height: 33px; flex: 0 0 auto; border: 1px solid #087568; border-radius: 50%; color: #f8fff9; background: linear-gradient(180deg, #35ffe4, #0f9c8d 48%, #086155); box-shadow: 0 3px 0 #045045, 0 1px 0 rgba(255,255,255,0.76) inset; font: 900 22px/1 var(--computer-font, Verdana, sans-serif); cursor: pointer; }
+  .week-anchor-copy { margin: 14px 0; color: #537167; font-family: var(--computer-font, Verdana, sans-serif); font-size: 13px; font-weight: 700; line-height: 1.45; }
+  .week-anchor-field { display: grid; gap: 6px; color: #285c25; font-family: var(--computer-font, Verdana, sans-serif); font-size: 12px; font-weight: 850; }
+  .week-anchor-field input { width: 100%; border: 1px solid #7bc8ae; border-radius: 9px; outline: none; color: #173a10; background: rgba(255,255,255,0.88); padding: 9px 10px; font: 700 14px/1.35 var(--computer-font, Verdana, sans-serif); }
+  .week-anchor-field input:focus { border-color: #f4c926; box-shadow: 0 0 0 3px rgba(244,201,38,0.2); }
+  .week-anchor-choice { display: flex; flex-wrap: wrap; gap: 9px 14px; margin: 14px 0 0; border: 0; padding: 0; color: #285c25; font-family: var(--computer-font, Verdana, sans-serif); font-size: 12px; font-weight: 850; }
+  .week-anchor-choice legend { padding: 0; }
+  .week-anchor-choice label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .week-anchor-status { min-height: 18px; margin: 12px 0 0; color: #2d8528; font-family: var(--computer-font, Verdana, sans-serif); font-size: 12px; font-weight: 800; }
+  .week-anchor-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .week-anchor-actions button { border: 1px solid #087568; border-radius: 7px; color: #f8fff9; background: linear-gradient(180deg, #35ffe4 0%, #0f9c8d 42%, #086155 100%); padding: 9px 12px; box-shadow: 0 3px 0 #045045, 0 1px 0 rgba(255,255,255,0.76) inset; font: 700 16px/1 var(--retro-font, "Brush Script MT", cursive); cursor: pointer; text-shadow: 0 1px 0 #fff89e, 0 2px 0 rgba(74,33,124,0.48); }
+  .week-anchor-actions button.is-save { color: #173a10; border-color: #fff4a0; background: linear-gradient(180deg, #fffbc9 0%, #f4cd25 34%, #9bc638 68%, #3d972f 100%); box-shadow: 0 3px 0 #236d20, 0 1px 0 rgba(255,255,255,0.78) inset; text-shadow: 0 1px 0 #fffcd4; }
+  .week-anchor-actions button:hover, .week-anchor-close:hover { filter: saturate(1.18) brightness(1.1); transform: translateY(-1px); }
   @media (max-width: 560px) { .collision-audit-form { padding: 15px; } .collision-audit-heading h2 { font-size: 23px; } .collision-audit-actions button { flex: 1 1 calc(50% - 6px); } }
 
   .collision-quick-panel {
@@ -518,17 +537,17 @@
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
   <meta name="theme-color" content="#0b4f32">
 </head>
-<body id="top" data-collision-audit-schedule="spring_2026">
+<body id="top" data-schedule-id="spring_2026" data-collision-audit-schedule="spring_2026">
 <header class="topbar">
   <div class="top-inner">
     <div>
-      <h1>Spring 2026 schedule</h1>
+      <h1>Rotations</h1>
 
     </div>
     <nav class="controls">
-      <a class="view-link is-current" href="index.html" data-calendar-view="schedule" aria-current="page">Schedule</a>
+      <a class="view-link is-current" href="index.html" data-calendar-view="schedule" aria-current="page">Rotations</a>
 <a class="view-link" href="Openings_Calendar.html" data-calendar-view="openings">Openings</a>
-<a class="view-link" href="Collisions_Calendar.html" data-calendar-view="collisions">Collisions</a><button type="button" data-class-filter-toggle aria-controls="class-filter" aria-expanded="false">Filter classes</button><details class="day-picker-menu" data-day-picker-menu><summary><span data-day-picker-summary>Choose day</span></summary><div class="day-picker-options"><button type="button" class="day-button" data-calendar-day-button data-sheet="Mon-Odd" aria-controls="mon-odd" aria-pressed="false">Mon-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Tues-Odd" aria-controls="tues-odd" aria-pressed="false">Tues-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Wed-Odd" aria-controls="wed-odd" aria-pressed="false">Wed-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Thurs-Odd" aria-controls="thurs-odd" aria-pressed="false">Thurs-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Fri-Odd" aria-controls="fri-odd" aria-pressed="false">Fri-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Sat-Odd" aria-controls="sat-odd" aria-pressed="false">Sat-Odd</button><span class="day-picker-break" aria-hidden="true"></span><button type="button" class="day-button" data-calendar-day-button data-sheet="Mon-Even" aria-controls="mon-even" aria-pressed="false">Mon-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Tues-Even" aria-controls="tues-even" aria-pressed="false">Tues-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Wed-Even" aria-controls="wed-even" aria-pressed="false">Wed-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Thurs-Even" aria-controls="thurs-even" aria-pressed="false">Thurs-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Fri-Even" aria-controls="fri-even" aria-pressed="false">Fri-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Sat-Even" aria-controls="sat-even" aria-pressed="false">Sat-Even</button></div></details><button type="button" data-collision-audit-export>Export audit</button>
+<a class="view-link" href="Collisions_Calendar.html" data-calendar-view="collisions">Collisions</a><button type="button" data-class-filter-toggle aria-controls="class-filter" aria-expanded="false">Filter classes</button><details class="day-picker-menu" data-day-picker-menu><summary><span data-day-picker-summary>Choose day</span></summary><div class="day-picker-options"><button type="button" class="day-button" data-calendar-day-button data-sheet="Mon-Odd" aria-controls="mon-odd" aria-pressed="false">Mon-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Tues-Odd" aria-controls="tues-odd" aria-pressed="false">Tues-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Wed-Odd" aria-controls="wed-odd" aria-pressed="false">Wed-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Thurs-Odd" aria-controls="thurs-odd" aria-pressed="false">Thurs-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Fri-Odd" aria-controls="fri-odd" aria-pressed="false">Fri-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Sat-Odd" aria-controls="sat-odd" aria-pressed="false">Sat-Odd</button><span class="day-picker-break" aria-hidden="true"></span><button type="button" class="day-button" data-calendar-day-button data-sheet="Mon-Even" aria-controls="mon-even" aria-pressed="false">Mon-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Tues-Even" aria-controls="tues-even" aria-pressed="false">Tues-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Wed-Even" aria-controls="wed-even" aria-pressed="false">Wed-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Thurs-Even" aria-controls="thurs-even" aria-pressed="false">Thurs-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Fri-Even" aria-controls="fri-even" aria-pressed="false">Fri-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Sat-Even" aria-controls="sat-even" aria-pressed="false">Sat-Even</button></div></details><button type="button" data-week-anchor-open>Set week anchor</button><button type="button" data-collision-audit-export>Export audit</button>
       <button type="button" onclick="window.print()">Print</button>
     </nav>
     <p class="auto-nav-status" data-auto-nav-status role="status" hidden></p>
@@ -3687,6 +3706,33 @@
 </div>
 </section>
 </main>
+<dialog class="week-anchor-dialog" data-week-anchor-dialog aria-labelledby="week-anchor-title">
+  <form class="week-anchor-form" data-week-anchor-form method="dialog">
+    <div class="week-anchor-heading">
+      <div>
+        <p class="week-anchor-kicker">BROWSER-LOCAL ROTATION RULE</p>
+        <h2 id="week-anchor-title">Set week anchor</h2>
+      </div>
+      <button type="button" class="week-anchor-close" data-week-anchor-close aria-label="Close week anchor window">×</button>
+    </div>
+    <p class="week-anchor-copy">Choose any date in the week and set whether that week is Odd or Even. Every week before and after it will alternate automatically in this browser.</p>
+    <label class="week-anchor-field">
+      <span>Date in the anchor week</span>
+      <input type="date" data-week-anchor-date required>
+    </label>
+    <fieldset class="week-anchor-choice">
+      <legend>That week is</legend>
+      <label><input type="radio" name="week-anchor-rotation" value="Odd" checked> Odd</label>
+      <label><input type="radio" name="week-anchor-rotation" value="Even"> Even</label>
+    </fieldset>
+    <p class="week-anchor-status" data-week-anchor-status role="status"></p>
+    <div class="week-anchor-actions">
+      <button type="button" data-week-anchor-clear>Use monthly default</button>
+      <button type="button" data-week-anchor-close>Cancel</button>
+      <button type="button" class="is-save" data-week-anchor-save>Save anchor</button>
+    </div>
+  </form>
+</dialog>
 <dialog class="collision-audit-dialog" data-collision-audit-dialog aria-labelledby="collision-audit-title">
   <form class="collision-audit-form" method="dialog">
     <div class="collision-audit-heading">
@@ -3729,6 +3775,7 @@
   </form>
 </dialog>
 <p class="collision-audit-toast" data-collision-audit-toast role="status" hidden></p>
+<script src="week-anchor.js"></script>
 <script src="schedule-version.js"></script>
 <script src="alternate-schedule.js"></script>
 <script src="schedule-alternates.js"></script>
@@ -4860,6 +4907,16 @@
   const targetYear = targetDate.getUTCFullYear();
   if (!scheduleDay[targetWeekday]) {
     waitForManualChoice('Choose a schedule day above.');
+    return;
+  }
+
+  const anchoredRotation = window.GymWeekAnchor && window.GymWeekAnchor.rotationForDate(targetDate);
+  if (anchoredRotation) {
+    const sheet = `${scheduleDay[targetWeekday]}-${anchoredRotation.rotation}`;
+    const statusPrefix = isSunday ? 'Sunday — showing upcoming ' : 'Showing ';
+    if (!showSheet(sheet, `${statusPrefix}${sheet} · saved week anchor`)) {
+      waitForManualChoice(`${sheet} is not included in this calendar.`);
+    }
     return;
   }
 
