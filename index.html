@@ -419,6 +419,7 @@
   @media (prefers-reduced-motion: reduce) { .session-block.is-linked-pair { animation: none; } }
 
   @media (max-width: 900px) { .top-inner, main { padding-left: 12px; padding-right: 12px; } .top-inner { align-items: flex-start; flex-direction: column; } .controls { justify-content: flex-start; } .day-section { border-radius: 14px; } .day-picker-options { left: 0; right: auto; } }
+  @media (min-width: 701px) and (max-width: 900px) { .day-picker-options { left: 50%; transform: translateX(-50%); } }
   @media (max-width: 700px) {
     .class-filter > summary { align-items: flex-start; flex-wrap: wrap; }
     .class-filter-summary { width: calc(100% - 38px); margin-left: 0; text-align: left; }
