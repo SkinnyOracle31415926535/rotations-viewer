@@ -71,7 +71,7 @@
   h1 { margin: 0; color: var(--purple); font-family: var(--retro-font); font-size: clamp(34px, 4vw, 53px); letter-spacing: -0.02em; line-height: 0.94; font-weight: 700; text-shadow: var(--text-raise); }
   .subtitle { margin: 8px 0 0; color: var(--muted); max-width: 880px; font-family: var(--computer-font); font-size: 14px; font-weight: 700; }
   .controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; max-width: 760px; }
-  .controls a, .controls button, .day-picker-menu > summary {
+  .controls a, .controls button {
     border: 1px solid #4a8fcf;
     color: #f8fbff;
     background: linear-gradient(180deg, #86efff 0%, #3ab9df 42%, #3976c7 100%);
@@ -83,18 +83,33 @@
     box-shadow: 0 4px 0 #2f599f, 0 9px 14px rgba(63, 44, 125, 0.2), 0 1px 0 rgba(255,255,255,0.76) inset;
     text-shadow: 0 1px 0 #f4fbff, 0 2px 0 rgba(74, 33, 124, 0.48);
   }
-  .controls a:hover, .controls button:hover, .day-picker-menu > summary:hover { filter: saturate(1.18) brightness(1.1); transform: translateY(-1px); }
+  .controls a:hover, .controls button:hover { filter: saturate(1.18) brightness(1.1); transform: translateY(-1px); }
   .day-picker-menu { position: relative; }
-  .day-picker-menu > summary { display: inline-flex; align-items: center; gap: 7px; list-style: none; }
+  .day-picker-menu > summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    gap: 7px;
+    border: 1px solid #237c3a;
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: #f8ffe9;
+    background: linear-gradient(180deg, #a9d84a 0%, #55ac3a 48%, #237c3a 100%);
+    box-shadow: 0 4px 0 #0f6130, 0 9px 14px rgba(24, 102, 52, 0.22), 0 1px 0 rgba(255,255,255,0.76) inset;
+    font: 700 16px/1 var(--retro-font);
+    list-style: none;
+    cursor: pointer;
+    text-shadow: 0 1px 0 #0b4028, 0 2px 0 rgba(7, 69, 31, 0.38);
+  }
+  .day-picker-menu > summary:hover { filter: saturate(1.18) brightness(1.1); transform: translateY(-1px); }
   .day-picker-menu > summary::-webkit-details-marker { display: none; }
-  .day-picker-menu > summary::after { content: "▾"; color: #f4fbff; font-family: var(--computer-font); font-size: 13px; transition: transform 150ms ease; }
+  .day-picker-menu > summary::after { content: "▾"; color: #f8ffe9; font-family: var(--computer-font); font-size: 13px; transition: transform 150ms ease; }
   .day-picker-menu[open] > summary::after { transform: rotate(180deg); }
   .day-picker-options { position: absolute; top: calc(100% + 10px); right: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; width: min(600px, calc(100vw - 28px)); padding: 12px; border: 3px ridge #d6d0ff; border-radius: 10px; background: rgba(250, 248, 255, 0.98); box-shadow: var(--shadow); }
   .day-picker-options button { min-width: 0; white-space: nowrap; }
   .day-picker-break { grid-column: 1 / -1; height: 1px; margin: 1px 0; background: #c9b6eb; }
   .nav-break { width: 100%; height: 0; }
   .controls a.view-link.is-current, .controls [data-calendar-day-button].is-current { outline: 3px solid #ffb1e2; outline-offset: 2px; color: #3b226f; border-color: #ffc8eb; background: linear-gradient(180deg, #fff6fd 0%, #ff9cd8 40%, #b489ee 76%, #8168cb 100%); box-shadow: 0 4px 0 #6650ad, 0 1px 0 rgba(255,255,255,0.78) inset; text-shadow: 0 1px 0 #fffaff; }
-  .auto-nav-status { margin: 9px 0 0; color: var(--muted); font-size: 13px; font-weight: 750; }
   main { padding-top: 23px; padding-bottom: 56px; }
   .table-review { display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: #5f45ad; color: #ffe4f7; border: 1px solid #ffe4f7; font-size: 12px; font-weight: 950; }
   .class-filter { scroll-margin-top: 164px; margin: -4px 0 20px; border: 2px ridge #d6d0ff; border-radius: 14px; background: rgba(255, 252, 255, 0.91); box-shadow: var(--shadow); overflow: hidden; }
@@ -550,7 +565,6 @@
 <a class="view-link" href="Collisions_Calendar.html" data-calendar-view="collisions">Collisions</a><button type="button" data-class-filter-toggle aria-controls="class-filter" aria-expanded="false">Filter classes</button><details class="day-picker-menu" data-day-picker-menu><summary><span data-day-picker-summary>Choose day</span></summary><div class="day-picker-options"><button type="button" class="day-button" data-calendar-day-button data-sheet="Mon-Odd" aria-controls="mon-odd" aria-pressed="false">Mon-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Tues-Odd" aria-controls="tues-odd" aria-pressed="false">Tues-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Wed-Odd" aria-controls="wed-odd" aria-pressed="false">Wed-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Thurs-Odd" aria-controls="thurs-odd" aria-pressed="false">Thurs-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Fri-Odd" aria-controls="fri-odd" aria-pressed="false">Fri-Odd</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Sat-Odd" aria-controls="sat-odd" aria-pressed="false">Sat-Odd</button><span class="day-picker-break" aria-hidden="true"></span><button type="button" class="day-button" data-calendar-day-button data-sheet="Mon-Even" aria-controls="mon-even" aria-pressed="false">Mon-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Tues-Even" aria-controls="tues-even" aria-pressed="false">Tues-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Wed-Even" aria-controls="wed-even" aria-pressed="false">Wed-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Thurs-Even" aria-controls="thurs-even" aria-pressed="false">Thurs-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Fri-Even" aria-controls="fri-even" aria-pressed="false">Fri-Even</button><button type="button" class="day-button" data-calendar-day-button data-sheet="Sat-Even" aria-controls="sat-even" aria-pressed="false">Sat-Even</button></div></details><button type="button" data-week-anchor-open>Set week anchor</button><button type="button" data-collision-audit-export>Export audit</button>
       <button type="button" onclick="window.print()">Print</button>
     </nav>
-    <p class="auto-nav-status" data-auto-nav-status role="status" hidden></p>
   </div>
 </header>
 <main>

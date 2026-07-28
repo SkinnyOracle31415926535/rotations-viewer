@@ -56,12 +56,6 @@
     letter-spacing: 0;
     text-shadow: var(--text-raise);
   }
-  .schedule-meta {
-    margin: -7px 0 11px;
-    color: #13543a;
-    font-size: 13px;
-    font-weight: 700;
-  }
   .controls {
     display: flex;
     flex-wrap: wrap;
@@ -87,7 +81,6 @@
   }
   .nav-break { flex-basis: 100%; height: 0; }
   .controls a.is-current { outline: 3px solid #f5ffd5; outline-offset: 2px; filter: saturate(1.18) brightness(1.1); }
-  .auto-nav-status { margin: 9px 0 0; color: #104e33; font-size: 13px; font-weight: 800; text-shadow: 0 1px 0 rgba(255,255,224,0.58); }
   main {
     max-width: 1480px;
     margin: 0 auto;
@@ -116,28 +109,12 @@
     color: #0a6338;
     text-shadow: var(--text-raise);
   }
-  .section-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-left: auto; }
   .section-head span {
     color: #0d5f36;
     font-family: "Trebuchet MS", "Lucida Grande", Verdana, sans-serif;
     font-size: 16px;
     font-weight: 900;
     text-shadow: 0 1px 0 rgba(255, 255, 225, 0.78), 0 3px 8px rgba(12, 109, 50, 0.26);
-  }
-  .day-collapse-toggle {
-    border: 1px solid #f6ffd1;
-    border-radius: 7px;
-    padding: 7px 10px;
-    color: #0b4028;
-    background: linear-gradient(180deg, #f6ffd1 0%, #a9d84a 42%, #55ac3a 100%);
-    box-shadow: 0 4px 0 #237c3a, 0 1px 0 rgba(255,255,255,0.8) inset;
-    font: 700 16px/1 var(--display-font);
-    cursor: pointer;
-    text-shadow: 0 1px 0 #ffffe5, 0 2px 0 rgba(8, 83, 39, 0.28);
-  }
-  .day-collapse-toggle:hover { filter: saturate(1.16) brightness(1.08); transform: translateY(-1px); }
-  .day-section.is-collapsed-day .collision-scroll { display: none; }
-  .day-section.is-collapsed-day { padding-bottom: 14px; }
   }
   .collision-scroll {
     overflow-x: hidden;
@@ -311,8 +288,6 @@
     h1 { font-size: 34px; }
     .section-head h2 { font-size: 24px; }
     .section-head span { font-size: 12px; }
-    .section-actions { gap: 7px; }
-    .day-collapse-toggle { font-size: 14px; padding: 6px 8px; }
     .collision-grid { grid-template-rows: 32px var(--timeline-height); }
     .corner, .equip-head { font-size: 7px; }
   }
@@ -325,8 +300,6 @@
     .day-section { break-before: page; border-bottom: 0; }
     .day-section:first-child { break-before: auto; }
     .collision-scroll { box-shadow: none; }
-    .day-section.is-collapsed-day .collision-scroll { display: block !important; }
-    .day-collapse-toggle { display: none !important; }
   }
 </style>
 </head>
@@ -335,7 +308,6 @@
   <div class="top-inner">
     <div>
       <h1>Collisions</h1>
-      <p class="schedule-meta">Schedule ID: spring_2026 · status: active</p>
     </div>
     <nav class="controls">
       <a class="view-link" href="index.html" data-calendar-view="schedule">Rotations</a>
@@ -357,7 +329,6 @@
 <a href="#sat-even" data-sheet="Sat-Even">Sat-Even</a>
       <button type="button" onclick="window.print()">Print</button>
     </nav>
-    <p class="auto-nav-status" data-auto-nav-status hidden></p>
   </div>
 </header>
 <main>
@@ -1617,41 +1588,10 @@
     status.textContent = message;
   };
   const daySections = Array.from(document.querySelectorAll('.day-section[data-sheet]'));
-  const setCollapseState = (section, collapsed) => {
-    const toggle = section.querySelector('[data-collision-day-collapse]');
-    section.classList.toggle('is-collapsed-day', collapsed);
-    if (!toggle) return;
-    toggle.setAttribute('aria-expanded', String(!collapsed));
-    toggle.textContent = collapsed ? 'Expand calendar' : 'Collapse calendar';
-  };
-
-  daySections.forEach((section) => {
-    const scroll = section.querySelector('.collision-scroll');
-    const head = section.querySelector('.section-head');
-    if (!scroll || !head) return;
-    scroll.id = `${section.id}-content`;
-    const actions = document.createElement('div');
-    actions.className = 'section-actions';
-    const count = head.querySelector('span');
-    if (count) actions.append(count);
-    const toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'day-collapse-toggle';
-    toggle.dataset.collisionDayCollapse = '';
-    toggle.setAttribute('aria-controls', scroll.id);
-    toggle.addEventListener('click', () => {
-      setCollapseState(section, !section.classList.contains('is-collapsed-day'));
-    });
-    actions.append(toggle);
-    head.append(actions);
-    setCollapseState(section, false);
-  });
-
   const revealHashTarget = () => {
     const hash = window.location.hash.slice(1).toLowerCase();
     const target = daySections.find((section) => section.id.toLowerCase() === hash);
     if (!target) return;
-    setCollapseState(target, false);
     const scrollTarget = () => {
       const header = document.querySelector('.topbar');
       const offset = (header ? header.getBoundingClientRect().height : 0) + 12;
