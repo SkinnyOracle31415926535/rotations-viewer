@@ -62,6 +62,7 @@
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
+    position: relative;
   }
   .controls a, .controls button {
     border: 1px solid #f6ffd1;
@@ -80,8 +81,32 @@
       0 11px 18px rgba(7, 101, 48, 0.28),
       0 1px 0 rgba(255, 255, 255, 0.8) inset;
   }
+  .day-picker-menu { position: static; }
+  .day-picker-menu > summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    gap: 7px;
+    border: 1px solid #237c3a;
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: #f8ffe9;
+    background: linear-gradient(180deg, #a9d84a 0%, #55ac3a 48%, #237c3a 100%);
+    box-shadow: 0 4px 0 #0f6130, 0 9px 14px rgba(24, 102, 52, 0.22), 0 1px 0 rgba(255,255,255,0.76) inset;
+    font: 700 18px/1 var(--display-font);
+    list-style: none;
+    cursor: pointer;
+    text-shadow: 0 1px 0 #0b4028, 0 2px 0 rgba(7, 69, 31, 0.38);
+  }
+  .day-picker-menu > summary:hover { filter: saturate(1.18) brightness(1.1); transform: translateY(-1px); }
+  .day-picker-menu > summary::-webkit-details-marker { display: none; }
+  .day-picker-menu > summary::after { content: "▾"; color: #f8ffe9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; transition: transform 150ms ease; }
+  .day-picker-menu[open] > summary::after { transform: rotate(180deg); }
+  .day-picker-options { position: absolute; top: calc(100% + 10px); left: 0; right: auto; z-index: 30; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; width: min(600px, 100%); padding: 12px; border: 3px ridge #f6ffd1; border-radius: 10px; background: rgba(246, 255, 193, 0.98); box-shadow: 0 12px 24px rgba(7, 101, 48, 0.28); }
+  .day-picker-options button { min-width: 0; white-space: nowrap; }
+  .day-picker-break { grid-column: 1 / -1; height: 1px; margin: 1px 0; background: rgba(23, 124, 58, 0.55); }
   .nav-break { flex-basis: 100%; height: 0; }
-  .controls a.is-current { outline: 3px solid #f5ffd5; outline-offset: 2px; filter: saturate(1.18) brightness(1.1); }
+  .controls a.is-current, .controls [data-calendar-day-button].is-current { outline: 3px solid #f5ffd5; outline-offset: 2px; filter: saturate(1.18) brightness(1.1); }
   main {
     max-width: 1480px;
     margin: 0 auto;
@@ -96,6 +121,7 @@
     background: linear-gradient(110deg, rgba(255, 255, 231, 0.25), rgba(218, 237, 67, 0.13) 47%, rgba(4, 143, 68, 0.15));
     box-shadow: 0 10px 22px rgba(18, 113, 50, 0.16), 0 1px 0 rgba(255, 255, 234, 0.5) inset;
   }
+  html.day-picker-ready .day-section[data-sheet]:not(.is-active-day) { display: none !important; }
   .section-head {
     display: flex;
     align-items: center;
@@ -247,7 +273,9 @@
       0 4px 0 rgba(19, 102, 43, 0.55),
       0 9px 13px rgba(7, 105, 48, 0.28);
     text-shadow: 0 1px 0 rgba(255, 255, 194, 0.68), 0 2px 3px rgba(2, 31, 5, 0.28);
+    cursor: pointer;
   }
+  .collision-block:focus-visible { z-index: 4; outline: 3px solid #fffbd0; outline-offset: 2px; }
   .collision-block::before {
     content: "";
     position: absolute;
@@ -297,6 +325,66 @@
   .status-fix { background-color: #e9e835; border-left: 4px solid #fffee0; }
   .status-check { background-color: #82c84f; border-left: 4px solid #f8ffe4; }
   .status-new { background-color: #b4d95a; border-left: 4px solid #fffbd0; }
+  .collision-detail-dialog {
+    width: min(700px, calc(100vw - 28px));
+    max-width: 700px;
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    color: #0b4b21;
+    background: transparent;
+    box-shadow: 0 22px 54px rgba(0, 49, 20, 0.46);
+  }
+  .collision-detail-dialog::backdrop { background: rgba(0, 52, 22, 0.54); backdrop-filter: blur(4px); }
+  .collision-detail-panel {
+    padding: 22px;
+    border: 3px ridge #f6ffd1;
+    border-radius: inherit;
+    background:
+      radial-gradient(circle at 90% 5%, rgba(246, 255, 209, 0.7), transparent 27%),
+      linear-gradient(135deg, #f6ffd1 0%, #d6e125 45%, #79bd42 100%);
+    box-shadow: 0 3px 0 rgba(255, 255, 232, 0.76) inset;
+  }
+  .collision-detail-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+  .collision-detail-kicker { margin: 0 0 3px; color: #237c3a; font-size: 11px; font-weight: 950; letter-spacing: 0.12em; }
+  .collision-detail-heading h2 { margin: 0; color: #075f32; font-family: var(--display-font); font-size: 36px; line-height: 0.98; text-shadow: var(--text-raise); }
+  .collision-detail-close {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+    border: 2px solid #f6ffd1;
+    border-radius: 50%;
+    color: #f8ffe9;
+    background: linear-gradient(180deg, #55ac3a, #237c3a);
+    box-shadow: 0 3px 0 #0f6130, 0 1px 0 rgba(255,255,255,0.72) inset;
+    font: 900 24px/1 system-ui, sans-serif;
+    cursor: pointer;
+  }
+  .collision-detail-close:focus-visible { outline: 3px solid #fffbd0; outline-offset: 3px; }
+  .collision-detail-overview { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 18px 0 14px; }
+  .collision-detail-overview p { margin: 0; font-weight: 850; }
+  .collision-detail-status { padding: 4px 8px; border: 1px solid rgba(255,255,232,0.86); border-radius: 999px; color: #12350d; background: rgba(255,255,228,0.76); font-size: 12px; font-weight: 950; letter-spacing: 0.07em; }
+  .collision-detail-status.is-check { background: #f6ffd1; }
+  .collision-detail-status.is-needs-review, .collision-detail-status.is-unreviewed { background: #fff3a7; }
+  .collision-detail-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin: 0 0 14px; }
+  .collision-detail-facts div, .collision-detail-class {
+    min-width: 0;
+    padding: 11px 12px;
+    border: 1px solid rgba(255, 255, 232, 0.72);
+    border-radius: 10px;
+    background: rgba(255,255,232,0.58);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.62) inset;
+  }
+  .collision-detail-facts dt, .collision-detail-class-label { margin: 0 0 3px; color: #237c3a; font-size: 10px; font-weight: 950; letter-spacing: 0.08em; text-transform: uppercase; }
+  .collision-detail-facts dd { margin: 0; font-weight: 900; }
+  .collision-detail-classes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .collision-detail-class h3 { margin: 0 0 7px; color: #075f32; font-size: 17px; }
+  .collision-detail-class p { margin: 4px 0 0; overflow-wrap: anywhere; font-size: 13px; font-weight: 750; }
+  .collision-detail-class strong { color: #0b4b21; }
+  .collision-detail-raw { margin-top: 13px; }
+  .collision-detail-raw summary { cursor: pointer; font-size: 12px; font-weight: 900; }
+  .collision-detail-raw p { margin: 8px 0 0; font-size: 12px; line-height: 1.45; }
   .empty {
     margin: 0 0 10px;
     color: #0d5f36;
@@ -317,6 +405,9 @@
     .section-head span { font-size: 12px; }
     .collision-grid { grid-template-rows: 32px var(--timeline-height); }
     .corner, .equip-head { font-size: 7px; }
+    .collision-detail-panel { padding: 16px; }
+    .collision-detail-heading h2 { font-size: 30px; }
+    .collision-detail-facts, .collision-detail-classes { grid-template-columns: 1fr; }
   }
   @media print {
     @page { size: landscape; margin: 0.35in; }
@@ -328,6 +419,7 @@
     .day-section:first-child { break-before: auto; }
     .collision-scroll { box-shadow: none; }
     .day-section.is-collapsed-day .collision-scroll { display: block !important; }
+    html.day-picker-ready .day-section[data-sheet]:not(.is-active-day) { display: block !important; }
   }
 </style>
 </head>
@@ -341,20 +433,7 @@
       <a class="view-link" href="index.html" data-calendar-view="schedule">Rotations</a>
 <a class="view-link" href="Openings_Calendar.html" data-calendar-view="openings">Openings</a>
 <a class="view-link is-current" href="Collisions_Calendar.html" data-calendar-view="collisions" aria-current="page">Collisions</a>
-<span class="nav-break" aria-hidden="true"></span>
-<a href="#mon-odd" data-sheet="Mon-Odd">Mon-Odd</a>
-<a href="#tues-odd" data-sheet="Tues-Odd">Tues-Odd</a>
-<a href="#wed-odd" data-sheet="Wed-Odd">Wed-Odd</a>
-<a href="#thurs-odd" data-sheet="Thurs-Odd">Thurs-Odd</a>
-<a href="#fri-odd" data-sheet="Fri-Odd">Fri-Odd</a>
-<a href="#sat-odd" data-sheet="Sat-Odd">Sat-Odd</a>
-<span class="nav-break" aria-hidden="true"></span>
-<a href="#mon-even" data-sheet="Mon-Even">Mon-Even</a>
-<a href="#tues-even" data-sheet="Tues-Even">Tues-Even</a>
-<a href="#wed-even" data-sheet="Wed-Even">Wed-Even</a>
-<a href="#thurs-even" data-sheet="Thurs-Even">Thurs-Even</a>
-<a href="#fri-even" data-sheet="Fri-Even">Fri-Even</a>
-<a href="#sat-even" data-sheet="Sat-Even">Sat-Even</a>
+<details class="day-picker-menu" data-day-picker-menu><summary><span data-day-picker-summary>Choose day</span></summary><div class="day-picker-options"><button type="button" data-calendar-day-button data-sheet="Mon-Odd" aria-controls="mon-odd" aria-pressed="false">Mon-Odd</button><button type="button" data-calendar-day-button data-sheet="Tues-Odd" aria-controls="tues-odd" aria-pressed="false">Tues-Odd</button><button type="button" data-calendar-day-button data-sheet="Wed-Odd" aria-controls="wed-odd" aria-pressed="false">Wed-Odd</button><button type="button" data-calendar-day-button data-sheet="Thurs-Odd" aria-controls="thurs-odd" aria-pressed="false">Thurs-Odd</button><button type="button" data-calendar-day-button data-sheet="Fri-Odd" aria-controls="fri-odd" aria-pressed="false">Fri-Odd</button><button type="button" data-calendar-day-button data-sheet="Sat-Odd" aria-controls="sat-odd" aria-pressed="false">Sat-Odd</button><span class="day-picker-break" aria-hidden="true"></span><button type="button" data-calendar-day-button data-sheet="Mon-Even" aria-controls="mon-even" aria-pressed="false">Mon-Even</button><button type="button" data-calendar-day-button data-sheet="Tues-Even" aria-controls="tues-even" aria-pressed="false">Tues-Even</button><button type="button" data-calendar-day-button data-sheet="Wed-Even" aria-controls="wed-even" aria-pressed="false">Wed-Even</button><button type="button" data-calendar-day-button data-sheet="Thurs-Even" aria-controls="thurs-even" aria-pressed="false">Thurs-Even</button><button type="button" data-calendar-day-button data-sheet="Fri-Even" aria-controls="fri-even" aria-pressed="false">Fri-Even</button><button type="button" data-calendar-day-button data-sheet="Sat-Even" aria-controls="sat-even" aria-pressed="false">Sat-Even</button></div></details>
     </nav>
   </div>
 </header>
@@ -1715,6 +1794,18 @@
 </div>
 </section>
 </main>
+<dialog class="collision-detail-dialog" data-collision-detail-dialog aria-labelledby="collision-detail-title">
+  <section class="collision-detail-panel">
+    <div class="collision-detail-heading">
+      <div>
+        <p class="collision-detail-kicker" data-collision-detail-kicker>COLLISION DIAGNOSTIC</p>
+        <h2 id="collision-detail-title" data-collision-detail-title>Collision details</h2>
+      </div>
+      <button class="collision-detail-close" type="button" data-collision-detail-close aria-label="Close collision details">×</button>
+    </div>
+    <div data-collision-detail-body></div>
+  </section>
+</dialog>
 <script src="week-anchor.js"></script>
 <script>
 (() => {
@@ -1943,6 +2034,169 @@
       window.setTimeout(() => target.classList.remove('is-linked-collision'), 3600);
     });
   };
+
+  const detailDialog = document.querySelector('[data-collision-detail-dialog]');
+  const detailTitle = document.querySelector('[data-collision-detail-title]');
+  const detailKicker = document.querySelector('[data-collision-detail-kicker]');
+  const detailBody = document.querySelector('[data-collision-detail-body]');
+  const detailClose = document.querySelector('[data-collision-detail-close]');
+  let lastDetailTrigger = null;
+
+  const parseCollisionDetail = (raw) => {
+    const timeRange = '\\d{1,2}:\\d{2}(?:AM|PM)-\\d{1,2}:\\d{2}(?:AM|PM)';
+    const pattern = new RegExp(
+      `^(.*?) collision:\\s*(.*?)\\s*\\((.*?)\\)\\.\\s*(.*?)\\s+\\[([^\\]]+)\\]\\s+(.+?)\\s+(${timeRange})\\s+vs\\s+(.*?)\\s+\\[([^\\]]+)\\]\\s+(.+?)\\s+(${timeRange})\\.\\s*Status:\\s*(.*?)\\.?$`
+    );
+    const match = raw.match(pattern);
+    if (!match) return null;
+    return {
+      equipment: match[1],
+      overlap: match[2],
+      duration: match[3],
+      first: { name: match[4], activity: match[5], source: match[6], time: match[7] },
+      second: { name: match[8], activity: match[9], source: match[10], time: match[11] },
+      status: match[12],
+    };
+  };
+
+  const appendFact = (facts, label, value) => {
+    const wrapper = document.createElement('div');
+    const term = document.createElement('dt');
+    const definition = document.createElement('dd');
+    term.textContent = label;
+    definition.textContent = value;
+    wrapper.append(term, definition);
+    facts.append(wrapper);
+  };
+
+  const createClassCard = (label, details) => {
+    const addLabeledValue = (element, labelText, value) => {
+      const labelNode = document.createElement('strong');
+      labelNode.textContent = labelText;
+      element.append(labelNode, document.createTextNode(value));
+    };
+    const card = document.createElement('article');
+    const cardLabel = document.createElement('p');
+    const name = document.createElement('h3');
+    const activity = document.createElement('p');
+    const source = document.createElement('p');
+    const time = document.createElement('p');
+    card.className = 'collision-detail-class';
+    cardLabel.className = 'collision-detail-class-label';
+    cardLabel.textContent = label;
+    name.textContent = details.name;
+    addLabeledValue(activity, 'Activity: ', details.activity);
+    addLabeledValue(source, 'Source: ', details.source);
+    addLabeledValue(time, 'Scheduled: ', details.time);
+    if (details.duration) {
+      const duration = document.createElement('p');
+      addLabeledValue(duration, 'Class length: ', `${details.duration} min`);
+      card.append(cardLabel, name, activity, source, time, duration);
+    } else {
+      card.append(cardLabel, name, activity, source, time);
+    }
+    if (details.booking) {
+      const booking = document.createElement('p');
+      addLabeledValue(booking, 'Booking ref: ', details.booking);
+      card.append(booking);
+    }
+    return card;
+  };
+
+  const populateCollisionDetails = (block) => {
+    if (!detailDialog || !detailTitle || !detailKicker || !detailBody) return;
+    const raw = block.title.trim();
+    const parsed = parseCollisionDetail(raw);
+    const day = block.dataset.collisionSheet || block.closest('.day-section')?.dataset.sheet || 'Schedule day';
+    const equipment = block.dataset.collisionEquipment || parsed?.equipment || 'Collision';
+    const overlap = parsed?.overlap || raw;
+    const duration = parsed?.duration ||
+      `${Math.max(Number(block.dataset.collisionEnd || 0) - Number(block.dataset.collisionStart || 0), 0)} min`;
+    const status = parsed?.status || 'NEEDS_REVIEW';
+    const first = {
+      name: block.dataset.collisionAGroup || parsed?.first.name || 'Class A',
+      activity: parsed?.first.activity || 'See generated detail',
+      source: parsed?.first.source || 'See generated detail',
+      time: parsed?.first.time || 'See generated detail',
+      duration: block.dataset.collisionADuration,
+      booking: block.dataset.collisionABooking,
+    };
+    const second = {
+      name: block.dataset.collisionBGroup || parsed?.second.name || 'Class B',
+      activity: parsed?.second.activity || 'See generated detail',
+      source: parsed?.second.source || 'See generated detail',
+      time: parsed?.second.time || 'See generated detail',
+      duration: block.dataset.collisionBDuration,
+      booking: block.dataset.collisionBBooking,
+    };
+    detailKicker.textContent = `${day.toUpperCase()} · COLLISION DIAGNOSTIC`;
+    detailTitle.textContent = `${equipment} collision`;
+    detailBody.replaceChildren();
+
+    const overview = document.createElement('div');
+    const summary = document.createElement('p');
+    const statusChip = document.createElement('span');
+    overview.className = 'collision-detail-overview';
+    summary.textContent = `${overlap} overlap on ${equipment}. Compare the two source records before changing either class.`;
+    statusChip.className = `collision-detail-status is-${status.toLowerCase().replace(/_/g, '-')}`;
+    statusChip.textContent = `STATUS: ${status.replace(/_/g, ' ')}`;
+    overview.append(summary, statusChip);
+
+    const facts = document.createElement('dl');
+    facts.className = 'collision-detail-facts';
+    appendFact(facts, 'Schedule day', day);
+    appendFact(facts, 'Overlap window', parsed?.overlap || 'See generated detail');
+    appendFact(facts, 'Overlap duration', duration);
+
+    const classes = document.createElement('div');
+    classes.className = 'collision-detail-classes';
+    classes.append(createClassCard('Class A', first), createClassCard('Class B', second));
+
+    const rawDetails = document.createElement('details');
+    const rawSummary = document.createElement('summary');
+    const rawText = document.createElement('p');
+    rawDetails.className = 'collision-detail-raw';
+    rawSummary.textContent = 'Raw generated collision detail';
+    rawText.textContent = raw;
+    rawDetails.append(rawSummary, rawText);
+    detailBody.append(overview, facts, classes, rawDetails);
+  };
+
+  const openCollisionDetails = (block) => {
+    if (!detailDialog) return;
+    lastDetailTrigger = block;
+    showCollisionActions(block);
+    populateCollisionDetails(block);
+    if (!detailDialog.open) detailDialog.showModal();
+    window.requestAnimationFrame(() => detailClose?.focus());
+  };
+
+  document.querySelectorAll('.collision-block').forEach((block) => {
+    block.tabIndex = 0;
+    block.setAttribute('role', 'button');
+    block.setAttribute('aria-haspopup', 'dialog');
+    block.setAttribute('aria-label', `Open collision details: ${block.title}`);
+    block.addEventListener('click', () => openCollisionDetails(block));
+    block.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      openCollisionDetails(block);
+    });
+  });
+  detailClose?.addEventListener('click', () => detailDialog?.close());
+  detailDialog?.addEventListener('click', (event) => {
+    if (event.target === detailDialog) detailDialog.close();
+  });
+  detailDialog?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    detailDialog.close();
+  });
+  detailDialog?.addEventListener('close', () => {
+    const trigger = lastDetailTrigger;
+    lastDetailTrigger = null;
+    if (trigger?.isConnected) window.requestAnimationFrame(() => trigger.focus());
+  });
 
   const showHashTarget = () => {
     const collision = collisionFromHash();

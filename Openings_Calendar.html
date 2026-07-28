@@ -64,6 +64,7 @@
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
+    position: relative;
   }
   .controls a, .controls button {
     border: 1px solid transparent;
@@ -88,7 +89,7 @@
     box-shadow: 0 5px 0 #9c4f00, 0 10px 16px rgba(20, 32, 24, 0.18), 0 1px 0 rgba(255, 255, 255, 0.82) inset;
     text-shadow: 0 1px 0 #fff2a8;
   }
-  .day-picker-menu { position: relative; }
+  .day-picker-menu { position: static; }
   .day-picker-menu > summary {
     display: inline-flex;
     align-items: center;
@@ -109,7 +110,7 @@
   .day-picker-menu > summary::-webkit-details-marker { display: none; }
   .day-picker-menu > summary::after { content: "▾"; color: #f8ffe9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; transition: transform 150ms ease; }
   .day-picker-menu[open] > summary::after { transform: rotate(180deg); }
-  .day-picker-options { position: absolute; top: calc(100% + 10px); right: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; width: min(600px, calc(100vw - 28px)); padding: 12px; border: 3px ridge #d7fff4; border-radius: 10px; background: rgba(251, 252, 247, 0.98); box-shadow: var(--shadow); }
+  .day-picker-options { position: absolute; top: calc(100% + 10px); left: 0; right: auto; z-index: 30; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; width: min(600px, 100%); padding: 12px; border: 3px ridge #d7fff4; border-radius: 10px; background: rgba(251, 252, 247, 0.98); box-shadow: var(--shadow); }
   .day-picker-options button { min-width: 0; white-space: nowrap; }
   .day-picker-break { grid-column: 1 / -1; height: 1px; margin: 1px 0; background: var(--line-strong); }
   .nav-break {
