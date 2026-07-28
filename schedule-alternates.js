@@ -140,9 +140,20 @@
         const remove = document.createElement('button');
         remove.type = 'button';
         remove.textContent = 'Remove';
-        remove.addEventListener('click', () => {
+        remove.addEventListener('click', async () => {
           if (!window.confirm('Remove this personal schedule modification? The published schedule will not change.')) return;
-          if (api.remove(record.id)) window.location.reload();
+          try {
+            if (await api.remove(record.id)) window.location.reload();
+          } catch (caught) {
+            if (caught && caught.localSaved) {
+              window.location.reload();
+            } else {
+              window.alert(
+                caught && caught.message ||
+                'The personal schedule modification could not be removed safely.'
+              );
+            }
+          }
         });
         actions.append(show, remove);
         item.append(copy, actions);
@@ -183,6 +194,9 @@
   };
 
   render();
+  window.addEventListener(api.changeEvent, (event) => {
+    if (event.detail && event.detail.source === 'sync') render();
+  });
   window.addEventListener('storage', (event) => {
     if (event.key === api.storageKey) window.location.reload();
   });

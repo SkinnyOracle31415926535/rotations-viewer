@@ -609,6 +609,7 @@
     html.day-picker-ready .day-section[data-sheet]:not(.is-active-day) { display: block !important; }
   }
 </style>
+<link rel="stylesheet" href="rotations-sync.css?v=2">
 </head>
 <body id="top" data-schedule-id="fall_2026">
 <header class="topbar">
@@ -5209,7 +5210,7 @@
     </div>
     <p class="opening-modification-selection" data-opening-modification-selection></p>
     <p class="opening-modification-warning">
-      This creates a browser-local modified card. It does not edit the published schedule or claim the station is officially assigned.
+      This saves a personal card locally first and can sync it after Ryan connects. It never edits the published schedule or claims the station is officially assigned.
     </p>
     <label class="opening-modification-field">
       <span>Class using this opening</span>
@@ -5507,5 +5508,8 @@
 <script src="schedule-version.js"></script>
 <script src="alternate-schedule.js"></script>
 <script src="opening-modifications.js"></script>
+<script src="collision-audit-store.js"></script>
+<script src="https://ryan-app-sync.ryan-666-mp3.chatgpt.site/ryan-app-sync.js"></script>
+<script src="rotations-sync.js?v=4"></script>
 </body>
 </html>

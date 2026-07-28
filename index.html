@@ -202,6 +202,7 @@
   .collision-badge[data-audit-state="needs_fix"] { background: #e3a276; }
   .collision-badge[data-audit-state="reviewed"] { background: #b9d9ad; }
   .collision-badge[data-audit-state="noted"] { background: #b6d4df; }
+  .collision-badge[data-audit-state="stale"] .collision-audit-mark { background: #ffb58f; }
   .review-badge { right: 31px; left: auto; background: #c0c0c0; color: #000; }
   .session-block.is-short { padding-top: 8px; padding-bottom: 8px; }
   .session-block.is-short > strong { font-size: 12px; }
@@ -551,6 +552,7 @@
   <!-- Gymnastics Vault icon -->
   <link rel="icon" type="image/png" href="icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+  <link rel="stylesheet" href="rotations-sync.css?v=2">
   <meta name="theme-color" content="#0b4f32">
 </head>
 <body id="top" data-schedule-id="fall_2026" data-collision-audit-schedule="fall_2026">
@@ -3349,12 +3351,12 @@
   <form class="week-anchor-form" data-week-anchor-form method="dialog">
     <div class="week-anchor-heading">
       <div>
-        <p class="week-anchor-kicker">BROWSER-LOCAL ROTATION RULE</p>
+        <p class="week-anchor-kicker">DEVICE-ONLY ROTATION RULE · SYNC PILOT</p>
         <h2 id="week-anchor-title">Set week anchor</h2>
       </div>
       <button type="button" class="week-anchor-close" data-week-anchor-close aria-label="Close week anchor window">×</button>
     </div>
-    <p class="week-anchor-copy">Choose any date in the week and set whether that week is Odd or Even. Every week before and after it will alternate automatically in this browser.</p>
+    <p class="week-anchor-copy">Choose any date in the week and set whether that week is Odd or Even. This stays on this device during the sync pilot while its calendar rule is repaired.</p>
     <label class="week-anchor-field">
       <span>Date in the anchor week</span>
       <input type="date" data-week-anchor-date required>
@@ -3376,13 +3378,13 @@
   <form class="collision-audit-form" method="dialog">
     <div class="collision-audit-heading">
       <div>
-        <p class="collision-audit-kicker">LOCAL COLLISION AUDIT</p>
+        <p class="collision-audit-kicker">PERSONAL COLLISION AUDIT</p>
         <h2 id="collision-audit-title">Review collision</h2>
       </div>
       <button type="button" class="collision-audit-close" data-collision-audit-close aria-label="Close audit window">×</button>
     </div>
     <p class="collision-audit-context" data-collision-audit-context>
-      This note stays in this browser only. It does not change the schedule or hide a warning.
+      This note saves locally first and can sync after Ryan connects. It does not change the schedule or hide a warning.
     </p>
     <label class="collision-audit-field">
       <span>Collision</span>
@@ -3400,7 +3402,7 @@
     </label>
     <label class="collision-audit-field">
       <span>Local note</span>
-      <textarea rows="5" data-collision-audit-notes placeholder="What needs to change, who is handling it, or why it is resolved?"></textarea>
+      <textarea rows="5" maxlength="4000" data-collision-audit-notes placeholder="What needs to change, who is handling it, or why it is resolved?"></textarea>
     </label>
     <p class="collision-audit-storage" data-collision-audit-storage role="status"></p>
     <div class="collision-audit-actions">
@@ -3417,6 +3419,7 @@
 <script src="week-anchor.js"></script>
 <script src="schedule-version.js"></script>
 <script src="alternate-schedule.js"></script>
+<script src="collision-audit-store.js"></script>
 <script src="schedule-alternates.js"></script>
 <script>
 (() => {
@@ -3908,6 +3911,10 @@
 (() => {
   const scheduleId = document.body.dataset.collisionAuditSchedule || 'default';
   const storageKey = `gymnastics-vault:collision-audit:v1:${scheduleId}`;
+  const auditStore = window.GymCollisionAudit;
+  const currentFingerprint = String(
+    window.GymScheduleVersion && window.GymScheduleVersion.source_fingerprint || ''
+  );
   const triggers = Array.from(document.querySelectorAll('[data-collision-audit-trigger]'));
   const exportButton = document.querySelector('[data-collision-audit-export]');
   const dialog = document.querySelector('[data-collision-audit-dialog]');
@@ -3940,6 +3947,11 @@
 
   function readAudit() {
     try {
+      if (auditStore) {
+        audit = auditStore.read();
+        persistentStorage = true;
+        return;
+      }
       const raw = window.localStorage.getItem(storageKey);
       if (!raw) return;
       const parsed = JSON.parse(raw);
@@ -3955,7 +3967,7 @@
     }
   }
 
-  function writeAudit() {
+  function writeAudit(change = {}) {
     audit.updated_at = now();
     try {
       window.localStorage.setItem(storageKey, JSON.stringify(audit));
@@ -3964,6 +3976,56 @@
     } catch (_error) {
       persistentStorage = false;
       return false;
+    }
+  }
+
+  async function saveAuditRecord(localRecordId, record) {
+    if (!auditStore) {
+      audit.records[localRecordId] = record;
+      const saved = writeAudit();
+      return { saved, queued: saved, error: '' };
+    }
+    try {
+      audit = await auditStore.saveRecord(localRecordId, record);
+      persistentStorage = true;
+      return { saved: true, queued: true, error: '' };
+    } catch (caught) {
+      if (caught && caught.localSaved) {
+        audit = caught.localStore || auditStore.read();
+        persistentStorage = true;
+        return { saved: true, queued: false, error: caught.message || '' };
+      }
+      return {
+        saved: false,
+        queued: false,
+        error: caught && caught.message ||
+          'The collision audit could not be saved without risking existing local data.',
+      };
+    }
+  }
+
+  async function removeAuditRecord(localRecordId) {
+    if (!auditStore) {
+      delete audit.records[localRecordId];
+      const saved = writeAudit();
+      return { saved, queued: saved, error: '' };
+    }
+    try {
+      audit = await auditStore.removeRecord(localRecordId);
+      persistentStorage = true;
+      return { saved: true, queued: true, error: '' };
+    } catch (caught) {
+      if (caught && caught.localSaved) {
+        audit = caught.localStore || auditStore.read();
+        persistentStorage = true;
+        return { saved: true, queued: false, error: caught.message || '' };
+      }
+      return {
+        saved: false,
+        queued: false,
+        error: caught && caught.message ||
+          'The collision audit could not be cleared without risking existing local data.',
+      };
     }
   }
 
@@ -4019,12 +4081,22 @@
     return activeRefs.find((ref) => ref.collision_key === select.value) || activeRefs[0] || null;
   }
 
-  function updateStorageMessage() {
+  function isCurrentAudit(record) {
+    return Boolean(record) &&
+      (!record.source_fingerprint || record.source_fingerprint === currentFingerprint);
+  }
+
+  function updateStorageMessage(record = null) {
     if (!storageStatus) return;
     storageStatus.classList.toggle('is-temporary', !persistentStorage);
-    storageStatus.textContent = persistentStorage
-      ? 'Saved only in this browser. It never changes the schedule database or hides a warning.'
-      : 'Temporary only: this browser is not allowing local storage. Export before closing this tab.';
+    if (record && !isCurrentAudit(record)) {
+      storageStatus.textContent =
+        'Saved for an older published schedule. It is preserved for export; save again only after reviewing this collision.';
+    } else {
+      storageStatus.textContent = persistentStorage
+        ? 'Saved locally first and queued for sync when Ryan connects. It never changes the schedule or hides a warning.'
+        : 'Temporary only: this browser is not allowing local storage. Export before closing this tab.';
+    }
   }
 
   function populateRecord() {
@@ -4034,15 +4106,17 @@
     if (details) details.textContent = ref.summary || refLabel(ref);
     if (statusInput) statusInput.value = saved.audit_status || '';
     if (notesInput) notesInput.value = saved.notes || '';
-    updateStorageMessage();
+    updateStorageMessage(saved);
   }
 
   function updateTriggerStates() {
     triggers.forEach((trigger) => {
       const refs = parseRefs(trigger);
-      const savedRecords = refs
+      const matchingRecords = refs
         .map((ref) => audit.records[recordId(ref)])
         .filter(Boolean);
+      const savedRecords = matchingRecords.filter(isCurrentAudit);
+      const staleRecords = matchingRecords.filter((record) => !isCurrentAudit(record));
       const states = savedRecords
         .map((record) => record.audit_status)
         .filter(Boolean);
@@ -4060,18 +4134,23 @@
           state = 'noted';
         }
       }
+      if (!savedRecords.length && staleRecords.length) state = 'stale';
       trigger.dataset.auditState = state;
       const mark = trigger.querySelector('[data-collision-audit-mark]');
       if (mark) {
-        mark.hidden = savedRecords.length === 0;
-        mark.textContent = savedRecords.length === refs.length
-          ? '✓'
-          : `${savedRecords.length}/${refs.length}`;
+        mark.hidden = savedRecords.length === 0 && staleRecords.length === 0;
+        mark.textContent = staleRecords.length && !savedRecords.length
+          ? '!'
+          : savedRecords.length === refs.length
+            ? '✓'
+            : `${savedRecords.length}/${refs.length}`;
       }
       const baseLabel = `${refs.length} unresolved collision warning${refs.length === 1 ? '' : 's'}. ` +
         'Single press highlights the affected schedule cards. Double press opens the review window.';
       trigger.dataset.auditBaseLabel = baseLabel;
-      const progress = savedRecords.length
+      const progress = staleRecords.length && !savedRecords.length
+        ? ' A preserved audit from an older schedule version needs review.'
+        : savedRecords.length
         ? ` Local audit saved for ${savedRecords.length} of ${refs.length} warning${refs.length === 1 ? '' : 's'}.`
         : ' No local audit saved yet.';
       trigger.setAttribute('aria-label', `${baseLabel}${progress}`);
@@ -4096,7 +4175,7 @@
     if (context) {
       context.textContent = mode === 'choose'
         ? 'Choose the exact collision to open. You can also save a local audit note here.'
-        : 'This note stays in this browser only. It does not change the schedule or hide a warning.';
+        : 'This note saves locally first and can sync after Ryan connects. It does not change the schedule or hide a warning.';
     }
     populateRecord();
     if (!dialog.open) dialog.showModal();
@@ -4240,10 +4319,11 @@
 
   if (select) select.addEventListener('change', populateRecord);
   if (saveButton) {
-    saveButton.addEventListener('click', () => {
+    saveButton.addEventListener('click', async () => {
       const ref = currentRef();
       if (!ref) return;
-      audit.records[recordId(ref)] = {
+      const localRecordId = recordId(ref);
+      const record = {
         schedule_id: scheduleId,
         collision_key: ref.collision_key,
         collision_id: ref.collision_id || '',
@@ -4256,22 +4336,32 @@
         audit_status: statusInput ? statusInput.value : '',
         notes: notesInput ? notesInput.value.trim() : '',
         updated_at: now(),
+        source_fingerprint: currentFingerprint,
       };
-      const saved = writeAudit();
+      const outcome = await saveAuditRecord(localRecordId, record);
       updateTriggerStates();
-      updateStorageMessage();
-      showToast(saved ? 'Local audit saved.' : 'Saved temporarily in this tab — export before closing.', saved ? 'success' : 'error');
+      updateStorageMessage(audit.records[localRecordId] || null);
+      showToast(
+        outcome.saved
+          ? (outcome.queued ? 'Local audit saved and queued for sync.' : 'Saved locally, but sync needs review.')
+          : outcome.error,
+        outcome.saved && outcome.queued ? 'success' : 'error'
+      );
     });
   }
   if (clearButton) {
-    clearButton.addEventListener('click', () => {
+    clearButton.addEventListener('click', async () => {
       const ref = currentRef();
       if (!ref) return;
-      delete audit.records[recordId(ref)];
-      const saved = writeAudit();
+      const outcome = await removeAuditRecord(recordId(ref));
       populateRecord();
       updateTriggerStates();
-      showToast(saved ? 'Local audit entry cleared.' : 'Temporary audit entry cleared.', saved ? 'success' : 'error');
+      showToast(
+        outcome.saved
+          ? (outcome.queued ? 'Local audit entry cleared and queued for sync.' : 'Cleared locally, but sync needs review.')
+          : outcome.error,
+        outcome.saved && outcome.queued ? 'success' : 'error'
+      );
     });
   }
   if (viewButton) {
@@ -4334,6 +4424,20 @@
 
   readAudit();
   updateTriggerStates();
+  if (auditStore) {
+    window.addEventListener(auditStore.changeEvent, (event) => {
+      if (!event.detail || !event.detail.store) return;
+      audit = event.detail.store;
+      updateTriggerStates();
+      if (dialog && dialog.open) populateRecord();
+    });
+    window.addEventListener('storage', (event) => {
+      if (event.key !== auditStore.storageKey) return;
+      readAudit();
+      updateTriggerStates();
+      if (dialog && dialog.open) populateRecord();
+    });
+  }
 })();
 </script>
 <script>
@@ -4662,5 +4766,7 @@
   focusPair();
 })();
 </script>
+<script src="https://ryan-app-sync.ryan-666-mp3.chatgpt.site/ryan-app-sync.js"></script>
+<script src="rotations-sync.js?v=4"></script>
 </body>
 </html>

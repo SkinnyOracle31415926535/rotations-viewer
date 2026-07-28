@@ -174,7 +174,7 @@
     return parsed.getDay() === weekdays[parts.weekday];
   };
 
-  const saveSelection = () => {
+  const saveSelection = async () => {
     if (!selectedOpening) return;
     const className = classInput.value.trim();
     if (!className) {
@@ -198,7 +198,7 @@
     }
 
     try {
-      api.save({
+      await api.save({
         source_schedule_id: scheduleVersion.schedule_id,
         source_fingerprint: scheduleVersion.source_fingerprint,
         source_sheet: selectedOpening.sheet,
@@ -215,11 +215,14 @@
       selectedOpening.block.classList.add('is-opening-saved');
       dialog.close();
       showToast(
-        'Personal modified card saved in this browser. It did not change the published schedule.',
+        'Personal card saved locally and queued for sync when connected. It did not change the published schedule.',
         `index.html#${selectedOpening.sheet.toLowerCase()}`
       );
-    } catch (_error) {
-      error.textContent = 'This browser could not save the personal modification.';
+    } catch (caught) {
+      error.textContent = caught && caught.localSaved
+        ? 'The modification was kept locally, but sync could not queue it. Open Sync & backup to review.'
+        : caught && caught.message ||
+          'The personal card could not be saved without risking existing local data.';
       error.hidden = false;
     }
   };
@@ -280,10 +283,10 @@
       if (record.source_schedule_id !== scheduleVersion.schedule_id ||
           record.source_fingerprint !== scheduleVersion.source_fingerprint) return;
       const missing = !availableKeys.has(record.source_opening.key);
-      api.updateValidation(
+      void api.updateValidation(
         record.id,
         missing ? 'The saved opening is no longer available in this published schedule.' : ''
-      );
+      ).catch(() => {});
     });
   };
 
@@ -308,9 +311,9 @@
   form.addEventListener('change', setScopeState);
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    saveSelection();
+    void saveSelection();
   });
-  saveButton.addEventListener('click', saveSelection);
+  saveButton.addEventListener('click', () => { void saveSelection(); });
   closeButtons.forEach((button) => button.addEventListener('click', () => dialog.close()));
   window.addEventListener('hashchange', focusOpenings);
   focusOpenings();
