@@ -56,6 +56,9 @@
           Create backup & preview
         </button>
         <button type="button" data-rotations-sync-disconnect data-sync-action>Disconnect</button>
+        <button type="button" data-rotations-sync-reset data-sync-action>
+          Reset device connection
+        </button>
       </div>
       <section class="rotations-sync-review" data-rotations-sync-review hidden
         aria-labelledby="rotations-sync-review-title">
@@ -77,6 +80,10 @@
         Authentication lasts only in this open page. Navigating to another calendar page may
         require connecting again; queued local work remains preserved.
       </p>
+      <p class="rotations-sync-footnote">
+        If this browser was revoked, reset its device connection before reconnecting.
+        Local Rotations records are not removed.
+      </p>
     </div>
   `;
   document.body.append(dialog);
@@ -87,6 +94,7 @@
   const backupButton = dialog.querySelector('[data-rotations-sync-backup]');
   const previewButton = dialog.querySelector('[data-rotations-sync-preview]');
   const disconnectButton = dialog.querySelector('[data-rotations-sync-disconnect]');
+  const resetButton = dialog.querySelector('[data-rotations-sync-reset]');
   const applyButton = dialog.querySelector('[data-rotations-sync-apply]');
   const stateBox = dialog.querySelector('[data-rotations-sync-state]');
   const stateLabel = dialog.querySelector('[data-rotations-sync-state-label]');
@@ -400,6 +408,7 @@
     syncButton.hidden = !['synced', 'offline', 'conflict'].includes(mode);
     previewButton.hidden = mode !== 'review';
     disconnectButton.hidden = mode === 'disconnected';
+    resetButton.hidden = mode !== 'disconnected';
     if (mode === 'conflict') void renderConflicts();
     else {
       conflictRender += 1;
@@ -450,6 +459,7 @@
     syncButton.hidden = true;
     previewButton.hidden = true;
     disconnectButton.hidden = true;
+    resetButton.hidden = true;
     throw error;
   });
   ready.catch(() => {});
@@ -518,6 +528,17 @@
       await ready;
       await client.disconnect();
       invalidatePreview();
+    });
+  });
+
+  resetButton.addEventListener('click', () => {
+    void runAction(async () => {
+      await ready;
+      await client.resetDevice();
+      invalidatePreview();
+      showAlert(
+        'Device connection reset. Local Rotations records were preserved; connect again and review a fresh migration preview.'
+      );
     });
   });
 
