@@ -220,7 +220,7 @@
       );
     } catch (caught) {
       error.textContent = caught && caught.localSaved
-        ? 'The modification was kept locally, but sync could not queue it. Open Sync & backup to review.'
+        ? 'The modification was kept locally.'
         : caught && caught.message ||
           'The personal card could not be saved without risking existing local data.';
       error.hidden = false;
