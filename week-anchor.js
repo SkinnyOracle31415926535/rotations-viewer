@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const scheduleId = document.body && document.body.dataset.scheduleId || 'spring_2026';
+  const scheduleId = document.body && document.body.dataset.scheduleId || 'winter_2026';
   const storageKey = `gymnastics-vault:week-anchor:v1:${scheduleId}`;
   const weekLength = 7 * 24 * 60 * 60 * 1000;
 
