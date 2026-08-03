@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const scheduleId = document.body && document.body.dataset.scheduleId || 'fall_2026';
+  const scheduleId = document.body && document.body.dataset.scheduleId || 'winter_2026';
   const storageKey = `gymnastics-vault:collision-audit:v1:${scheduleId}`;
   const changeEvent = 'gymnastics-vault:collision-audit-change';
   const aggregateLock = 'rotations-viewer:sync-local-aggregate-v1';
