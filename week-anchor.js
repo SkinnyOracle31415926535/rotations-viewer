@@ -4,6 +4,19 @@
   const scheduleId = document.body && document.body.dataset.scheduleId || 'winter_2026';
   const storageKey = `gymnastics-vault:week-anchor:v1:${scheduleId}`;
   const weekLength = 7 * 24 * 60 * 60 * 1000;
+  const syncRecordId = `anchor:${scheduleId}`;
+  const aggregateLock = 'rotations-viewer:sync-local-aggregate-v1';
+  let fallbackLock = Promise.resolve();
+  let mutationFence = 0;
+
+  const withAggregateLock = task => {
+    if (navigator.locks && typeof navigator.locks.request === 'function') {
+      return navigator.locks.request(aggregateLock, { mode: 'exclusive' }, task);
+    }
+    const run = fallbackLock.then(task, task);
+    fallbackLock = run.catch(() => {});
+    return run;
+  };
 
   const dateText = (date) => {
     const year = date.getUTCFullYear();
@@ -46,11 +59,80 @@
     }
   };
 
+  const exactKeys = (value, expected) => (
+    value && typeof value === 'object' && !Array.isArray(value)
+    && Object.keys(value).sort().join('\u001f') === expected.slice().sort().join('\u001f')
+  );
+
+  const syncValue = candidate => {
+    const normalized = normalize(candidate);
+    return normalized ? {
+      date: normalized.date,
+      week_start: normalized.week_start,
+      rotation: normalized.rotation,
+      saved_at: normalized.saved_at,
+    } : null;
+  };
+
+  const isSyncValue = (recordId, candidate) => (
+    recordId === syncRecordId
+    && exactKeys(candidate, ['date', 'week_start', 'rotation', 'saved_at'])
+    && Boolean(syncValue(candidate))
+    && JSON.stringify(syncValue(candidate)) === JSON.stringify(candidate)
+  );
+
+  const readStrict = () => {
+    const raw = window.localStorage.getItem(storageKey);
+    if (raw === null) return null;
+    try {
+      const value = syncValue(JSON.parse(raw));
+      if (!value) throw new Error('The local week anchor needs a raw backup and review.');
+      return value;
+    } catch (error) {
+      throw error instanceof Error
+        ? error
+        : new Error('The local week anchor needs a raw backup and review.');
+    }
+  };
+
+  const listSyncRecords = () => withAggregateLock(() => {
+    const value = readStrict();
+    return value ? [{ recordId: syncRecordId, value }] : [];
+  });
+
+  const verifyCurrent = (recordId, value, { deleted = false } = {}) => withAggregateLock(() => {
+    const current = readStrict();
+    if (recordId !== syncRecordId
+      || (deleted ? Boolean(current) : !current || JSON.stringify(current) !== JSON.stringify(value))) {
+      throw new Error('A newer local week-anchor edit was preserved.');
+    }
+  });
+
+  const applySync = (recordId, value, { deleted = false } = {}) => withAggregateLock(() => {
+    if (recordId !== syncRecordId || (!deleted && !isSyncValue(recordId, value))) {
+      throw new Error('The synchronized week anchor is invalid.');
+    }
+    const capturedFence = mutationFence;
+    const previousRaw = window.localStorage.getItem(storageKey);
+    if (deleted) window.localStorage.removeItem(storageKey);
+    else window.localStorage.setItem(storageKey, JSON.stringify(value));
+    if (mutationFence !== capturedFence) {
+      if (previousRaw === null) window.localStorage.removeItem(storageKey);
+      else window.localStorage.setItem(storageKey, previousRaw);
+      throw new Error('A newer local week-anchor edit was preserved.');
+    }
+    const expected = deleted ? null : JSON.stringify(value);
+    if (window.localStorage.getItem(storageKey) !== expected) {
+      throw new Error('The synchronized week anchor could not be verified.');
+    }
+  });
+
   const save = ({ date, rotation }) => {
     const record = normalize({ date, rotation, saved_at: new Date().toISOString() });
     if (!record) return null;
     try {
       window.localStorage.setItem(storageKey, JSON.stringify(record));
+      mutationFence += 1;
       return record;
     } catch (_error) {
       return null;
@@ -60,6 +142,7 @@
   const clear = () => {
     try {
       window.localStorage.removeItem(storageKey);
+      mutationFence += 1;
       return true;
     } catch (_error) {
       return false;
@@ -95,9 +178,15 @@
 
   window.GymWeekAnchor = Object.freeze({
     storageKey,
+    syncRecordId,
     read,
     save,
     clear,
+    syncValue,
+    isSyncValue,
+    listSyncRecords,
+    verifyCurrent,
+    applySync,
     rotationForDate,
     todayInTimezone,
   });

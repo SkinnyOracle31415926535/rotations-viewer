@@ -4790,10 +4790,97 @@
       summarizeRecords(records) {
         const count = [...records.values()].filter((raw) => raw !== null).length;
         return `${count} saved rotation audit${count === 1 ? "" : "s"}, alternate, or week-anchor record${count === 1 ? "" : "s"}`;
+      },
+      semanticSync: {
+        collections: ["alternate_schedules", "collision_audits", "week_anchors"],
+        async listRecords() {
+          const scheduleId = document.body?.dataset.scheduleId || "winter_2026";
+          const collisionPrefix = "gymnastics-vault:collision-audit:v1:";
+          const anchorPrefix = "gymnastics-vault:week-anchor:v1:";
+          for (let index = 0; index < localStorage.length; index += 1) {
+            const key = localStorage.key(index);
+            if ((key?.startsWith(collisionPrefix) || key?.startsWith(anchorPrefix))
+              && !key.endsWith(":" + scheduleId)) {
+              throw new Error("This browser has rotation data for another schedule. Export it before enabling private sync.");
+            }
+          }
+          const alternate = await window.GymAlternateSchedule.listSyncRecords();
+          const audits = await window.GymCollisionAudit.listSyncRecords();
+          const anchors = await window.GymWeekAnchor.listSyncRecords();
+          return [
+            ...alternate.map((item) => ({
+              collection: "alternate_schedules", recordId: item.recordId, value: item.value
+            })),
+            ...audits.map((item) => ({
+              collection: "collision_audits", recordId: item.recordId, value: item.value
+            })),
+            ...anchors.map((item) => ({
+              collection: "week_anchors", recordId: item.recordId, value: item.value
+            }))
+          ];
+        },
+        validateRecord(record) {
+          if (record.collection === "alternate_schedules") {
+            return /^alternate:[a-f0-9]{64}$/.test(record.recordId)
+              && (record.deleted || window.GymAlternateSchedule.isSyncValue(record.recordId, record.value));
+          }
+          if (record.collection === "collision_audits") {
+            return /^audit:[A-Za-z0-9._-]+:[A-Za-z0-9._:@/-]{1,159}$/.test(record.recordId)
+              && (record.deleted || window.GymCollisionAudit.isSyncValue(record.recordId, record.value));
+          }
+          if (record.collection === "week_anchors") {
+            return /^anchor:[A-Za-z0-9._-]+$/.test(record.recordId)
+              && (record.deleted || window.GymWeekAnchor.isSyncValue(record.recordId, record.value));
+          }
+          return false;
+        },
+        verifyLocal(record) {
+          if (record.collection === "alternate_schedules") {
+            return window.GymAlternateSchedule.verifyCurrent(
+              record.recordId, record.value, { deleted: Boolean(record.deleted) }
+            );
+          }
+          if (record.collection === "collision_audits") {
+            return window.GymCollisionAudit.verifyCurrent(
+              record.recordId, record.value, { deleted: Boolean(record.deleted) }
+            );
+          }
+          if (record.collection === "week_anchors") {
+            return window.GymWeekAnchor.verifyCurrent(
+              record.recordId, record.value, { deleted: Boolean(record.deleted) }
+            );
+          }
+          throw new Error("Rotations Viewer sync collection is invalid.");
+        },
+        applyRemote(record) {
+          if (record.collection === "alternate_schedules") {
+            return window.GymAlternateSchedule.applySync(
+              record.recordId, record.value, Boolean(record.deleted)
+            );
+          }
+          if (record.collection === "collision_audits") {
+            return window.GymCollisionAudit.applySync(
+              record.recordId, record.value, Boolean(record.deleted)
+            );
+          }
+          if (record.collection === "week_anchors") {
+            return window.GymWeekAnchor.applySync(
+              record.recordId, record.value, { deleted: Boolean(record.deleted) }
+            );
+          }
+          throw new Error("Rotations Viewer sync collection is invalid.");
+        },
+        priority(record) {
+          if (record.deleted) return 10;
+          if (record.collection === "alternate_schedules") return 0;
+          if (record.collection === "collision_audits") return 1;
+          return 2;
+        }
       }
     };
   })();
 </script>
+<script src="semantic-sync.js"></script>
 <script src="migration-transfer.js"></script>
 </body>
 </html>

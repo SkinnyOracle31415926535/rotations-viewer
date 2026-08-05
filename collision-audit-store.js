@@ -250,6 +250,21 @@
       toSyncRecord(recordId, candidate));
   });
 
+  const verifyCurrent = (recordId, candidate, { deleted = false } = {}) => withAggregateLock(() => {
+    const store = read();
+    const prefix = `audit:${scheduleId}:`;
+    if (typeof recordId !== 'string' || !recordId.startsWith(prefix)) {
+      throw new Error('A staged collision-audit identifier was rejected.');
+    }
+    const localRecordId = `${scheduleId}:${recordId.slice(prefix.length)}`;
+    const existing = Object.prototype.hasOwnProperty.call(store.records, localRecordId)
+      ? toSyncRecord(localRecordId, store.records[localRecordId]).value
+      : null;
+    if (deleted ? existing !== null : existing === null || JSON.stringify(existing) !== JSON.stringify(candidate)) {
+      throw new Error('A newer local collision-audit edit was preserved.');
+    }
+  });
+
   const applySync = (recordId, candidate, deleted = false) => withAggregateLock(() => {
     const store = read();
     const remotePrefix = `audit:${scheduleId}:`;
@@ -300,6 +315,7 @@
     toSyncRecord,
     toRemoteRecordId,
     listSyncRecords,
+    verifyCurrent,
     isSyncValue,
     applySync,
   });

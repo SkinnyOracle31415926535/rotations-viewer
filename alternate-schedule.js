@@ -203,6 +203,17 @@
     return records;
   });
 
+  const verifyCurrent = (recordId, candidate, { deleted = false } = {}) => withAggregateLock(async () => {
+    assertStoredDataValid();
+    const records = await Promise.all(read().records.map(toSyncRecord));
+    const matches = records.filter((record) => record.recordId === recordId);
+    if (matches.length > 1
+      || (deleted ? matches.length > 0
+        : matches.length !== 1 || JSON.stringify(matches[0].value) !== JSON.stringify(candidate))) {
+      throw new Error('A newer local alternate schedule edit was preserved.');
+    }
+  });
+
   const exactKeys = (value, expected) =>
     value && typeof value === 'object' && !Array.isArray(value) &&
     Object.keys(value).sort().join('\u001f') === expected.slice().sort().join('\u001f');
@@ -412,6 +423,7 @@
     syncValue,
     toSyncRecord,
     listSyncRecords,
+    verifyCurrent,
     isSyncValue,
     applySync,
     save,
