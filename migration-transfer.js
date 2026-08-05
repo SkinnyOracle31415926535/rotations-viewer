@@ -583,26 +583,29 @@
     host.setAttribute("aria-label", "Temporary settings and data transfer");
     host.innerHTML = `
       <style>
-        .app-transfer-tools { position: fixed; z-index: 2147483000; right: 12px; bottom: 12px; width: min(360px, calc(100vw - 24px)); color: #122018; font: 600 13px/1.35 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; text-align: left; }
-        .app-transfer-tools details { overflow: hidden; border: 2px solid #1f5d38; border-radius: 12px; background: #f5fff8; box-shadow: 0 12px 30px rgba(0,0,0,.28); }
-        .app-transfer-tools summary { cursor: pointer; padding: 10px 12px; color: #fff; background: #1f5d38; font-weight: 800; }
-        .app-transfer-tools [data-transfer-body] { padding: 12px; }
+        .app-transfer-tools { position: fixed; z-index: 2147483000; right: 12px; bottom: 12px; width: min(360px, calc(100vw - 24px)); color: #2b195a; font: 700 13px/1.35 var(--computer-font, "Trebuchet MS", Verdana, Arial, sans-serif); text-align: left; }
+        .app-transfer-tools details { overflow: hidden; border: 3px ridge #d9d2ff; border-radius: 14px; background: rgba(255, 252, 255, 0.94); box-shadow: var(--shadow, 0 8px 0 rgba(106, 81, 184, 0.25), 0 20px 36px rgba(71, 46, 122, 0.2)); }
+        .app-transfer-tools summary { cursor: pointer; list-style: none; padding: 12px 15px; color: #5e3bb8; background: linear-gradient(135deg, rgba(255,255,255,0.94), rgba(229,239,255,0.9) 55%, rgba(255,229,245,0.88)); font: 700 20px/1 var(--retro-font, "Brush Script MT", cursive); text-shadow: 0 1px 0 #fff9ff, 0 2px 0 #ffacd9; }
+        .app-transfer-tools summary::-webkit-details-marker { display: none; }
+        .app-transfer-tools [data-transfer-body] { padding: 13px 15px 15px; border-top: 1px solid rgba(102, 80, 186, 0.28); background: linear-gradient(135deg, rgba(255,255,255,0.74), rgba(229,239,255,0.74) 55%, rgba(255,229,245,0.72)); }
         .app-transfer-tools p { margin: 0 0 10px; }
         .app-transfer-tools [data-transfer-actions] { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .app-transfer-tools button { min-height: 40px; border: 2px solid #17472b; border-radius: 8px; padding: 8px; color: #fff; background: #287849; font: inherit; font-weight: 800; cursor: pointer; }
-        .app-transfer-tools button[data-transfer-import] { color: #17351f; background: #c8f4d4; }
-        .app-transfer-tools button:focus-visible, .app-transfer-tools summary:focus-visible { outline: 3px solid #f0b429; outline-offset: 2px; }
-        .app-transfer-tools [data-transfer-message] { min-height: 1.35em; color: #274832; font-size: 12px; }
-        .app-transfer-tools [data-transfer-message][data-kind="error"] { color: #a31919; }
-        .app-transfer-tools [data-transfer-message][data-kind="success"] { color: #0d5c2d; }
-        .app-transfer-tools [data-transfer-preview] { margin-top: 10px; padding-top: 10px; border-top: 1px solid #9ac9a7; }
-        .app-transfer-tools [data-transfer-preview] button { width: 100%; margin-top: 8px; background: #0f6b36; }
-        .app-transfer-tools [data-transfer-sync] { margin-top: 10px; padding-top: 10px; border-top: 1px solid #9ac9a7; }
+        .app-transfer-tools button { min-height: 42px; border: 1px solid #4a8fcf; border-radius: 7px; padding: 8px 10px; color: #f8fbff; background: linear-gradient(180deg, #86efff 0%, #3ab9df 42%, #3976c7 100%); box-shadow: 0 3px 0 #2f599f, 0 1px 0 rgba(255,255,255,0.76) inset; font: 700 16px/1 var(--retro-font, "Brush Script MT", cursive); text-shadow: 0 1px 0 #f4fbff, 0 2px 0 rgba(74,33,124,0.48); cursor: pointer; }
+        .app-transfer-tools button:hover { filter: saturate(1.18) brightness(1.1); transform: translateY(-1px); }
+        .app-transfer-tools button[data-transfer-import] { border-color: #237c3a; color: #f8ffe9; background: linear-gradient(180deg, #a9d84a 0%, #55ac3a 48%, #237c3a 100%); box-shadow: 0 3px 0 #0f6130, 0 1px 0 rgba(255,255,255,0.76) inset; text-shadow: 0 1px 0 #0b4028, 0 2px 0 rgba(7,69,31,0.38); }
+        .app-transfer-tools [data-transfer-private-recovery] { width: 100%; margin-top: 8px; }
+        .app-transfer-tools button:focus-visible, .app-transfer-tools summary:focus-visible { outline: 3px solid #ffb1e2; outline-offset: 3px; }
+        .app-transfer-tools [data-transfer-message] { min-height: 1.35em; color: #695a91; font-size: 12px; }
+        .app-transfer-tools [data-transfer-message][data-kind="error"] { color: #b015a6; }
+        .app-transfer-tools [data-transfer-message][data-kind="success"] { color: #237c3a; }
+        .app-transfer-tools [data-transfer-preview] { margin-top: 10px; padding-top: 10px; border-top: 1px solid #c9b6eb; }
+        .app-transfer-tools [data-transfer-preview] button { width: 100%; margin-top: 8px; border-color: #ffc8eb; color: #3b226f; background: linear-gradient(180deg, #fff6fd 0%, #ff9cd8 40%, #b489ee 76%, #8168cb 100%); box-shadow: 0 3px 0 #6650ad, 0 1px 0 rgba(255,255,255,0.78) inset; text-shadow: 0 1px 0 #fffaff; }
+        .app-transfer-tools [data-transfer-sync] { margin-top: 10px; padding-top: 10px; border-top: 1px solid #c9b6eb; }
         .app-transfer-tools [data-transfer-sync] strong { display: block; margin-bottom: 4px; }
-        .app-transfer-tools [data-transfer-sync-now] { width: 100%; margin: 7px 0; background: #1e5f86; }
-        .app-transfer-tools [data-transfer-sync-status][data-kind="conflict"] { color: #9a3a00; }
-        .app-transfer-tools .app-transfer-conflict { display: grid; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #bad1c0; font-size: 12px; }
-        .app-transfer-tools .app-transfer-conflict button { min-height: 32px; padding: 5px; font-size: 12px; background: #704d11; }
+        .app-transfer-tools [data-transfer-sync-now] { width: 100%; margin: 7px 0; border-color: #237c3a; color: #f8ffe9; background: linear-gradient(180deg, #a9d84a 0%, #55ac3a 48%, #237c3a 100%); box-shadow: 0 3px 0 #0f6130, 0 1px 0 rgba(255,255,255,0.76) inset; }
+        .app-transfer-tools [data-transfer-sync-status][data-kind="conflict"] { color: #b015a6; }
+        .app-transfer-tools .app-transfer-conflict { display: grid; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #c9b6eb; font-size: 12px; }
+        .app-transfer-tools .app-transfer-conflict button { min-height: 34px; padding: 5px; font-size: 13px; border-color: #ffc8eb; color: #3b226f; background: linear-gradient(180deg, #fff6fd 0%, #ff9cd8 40%, #b489ee 76%, #8168cb 100%); box-shadow: 0 3px 0 #6650ad, 0 1px 0 rgba(255,255,255,0.78) inset; text-shadow: 0 1px 0 #fffaff; }
         @media (max-width: 480px) { .app-transfer-tools { right: 8px; bottom: 8px; width: min(340px, calc(100vw - 16px)); } }
       </style>
       <details>
