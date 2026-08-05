@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="application-name" content="Rotations Viewer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rotations Viewer">
+<meta name="theme-color" content="#5e3bb8">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <title>Rotations</title>
 <style>
   :root {
@@ -4765,5 +4772,28 @@
   focusPair();
 })();
 </script>
+<script>
+  window.AppMigrationConfig = (() => {
+    const staticKeys = ["gymnastics-vault:alternate-schedule:v1"];
+    const dynamic = /^(gymnastics-vault:(?:collision-audit|week-anchor):v1:)[A-Za-z0-9._-]{1,180}$/;
+    return {
+      appId: "rotations-viewer",
+      ownedKeys: staticKeys,
+      ownsKey: (key) => dynamic.test(key),
+      validateRecords(records) {
+        for (const [key, raw] of records) {
+          if (raw === null) continue;
+          try { JSON.parse(raw); }
+          catch (_error) { throw new Error(`Rotations Viewer record ${key} is not valid JSON.`); }
+        }
+      },
+      summarizeRecords(records) {
+        const count = [...records.values()].filter((raw) => raw !== null).length;
+        return `${count} saved rotation audit${count === 1 ? "" : "s"}, alternate, or week-anchor record${count === 1 ? "" : "s"}`;
+      }
+    };
+  })();
+</script>
+<script src="migration-transfer.js"></script>
 </body>
 </html>
